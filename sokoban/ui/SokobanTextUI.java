@@ -28,9 +28,9 @@ public class SokobanTextUI {
 	}
 
 	/**
-	 * Main control loop.  This displays the puzzle, then enters a loop displaying a menu,
-	 * getting the user command, executing the command, displaying the puzzle and checking
-	 * if further moves are possible
+	 * This displays the initial options available for player.
+	 * A new game can be started, a previously saved game can be loaded
+	 * or the program can be shut down
 	 */
 	public void initMenu() {
 		displayInitMenu();
@@ -39,7 +39,7 @@ public class SokobanTextUI {
 	}
 
 	/**
-	 * Display the initial user menu
+	 * Display the initial user menu of options
 	 */
 	private void displayInitMenu()  {
 		System.out.println("Commands are:");
@@ -49,7 +49,7 @@ public class SokobanTextUI {
 	}
 
 	/**
-	 * Execute the user command string
+	 * Execute the initial user command string
 	 *
 	 * @param command the user command string
 	 */
@@ -67,7 +67,7 @@ public class SokobanTextUI {
 	}
 
 	/**
-	 * Main control loop.  This displays the puzzle, then enters a loop displaying a menu,
+	 * The main game control loop.  This displays the puzzle, then enters a loop displaying a menu,
 	 * getting the user command, executing the command, displaying the puzzle and checking
 	 * if further moves are possible
 	 */
@@ -77,6 +77,7 @@ public class SokobanTextUI {
 		System.out.print(puzzle);
 		while (!command.equalsIgnoreCase("Quit") && !puzzle.onTarget())  {
 			displayMenu();
+			lastMove = command;
 			command = getCommand();
 			execute(command);
 			System.out.print("\n" + puzzle);
@@ -133,7 +134,7 @@ public class SokobanTextUI {
 		} else if (command.equalsIgnoreCase("P")) {
 			playerMove();
 		} else if (command.equalsIgnoreCase("U")) {
-			System.out.println("not implemented yet");
+			undoMove();
 		} else if (command.equalsIgnoreCase("Clear")) {
 			clearPuzzle();
 		} else if (command.equalsIgnoreCase("New")) {
@@ -200,7 +201,7 @@ public class SokobanTextUI {
 	}
 
 	/**
-	 * Initialising game state
+	 * Initialising game state from screen file
 	 */
 	public void initGameAttr() {
 		Integer randomNum = ThreadLocalRandom.current().nextInt(minScreen, maxScreen + 1);
@@ -209,7 +210,7 @@ public class SokobanTextUI {
 	}
 
 	/**
-	 * Generate game from saved screen state
+	 * Generate game from currently available class variables
 	 */
 	public void genGame() {
 		puzzle = new Sokoban(new File(screenPath));
@@ -227,11 +228,64 @@ public class SokobanTextUI {
 	}
 
 	/**
+	 * Undo last player move if move is E, W, N, S
+	 */
+	public void undoMove() {
+		System.out.println("\n\nAttempting to undo move.");
+		if (lastMove.equalsIgnoreCase("N")) {
+			System.out.println("Move undone.");
+			south();
+		} else if (lastMove.equalsIgnoreCase("S")) {
+			System.out.println("Move undone.");
+			north();
+		} else if (lastMove.equalsIgnoreCase("E")) {
+			System.out.println("Move undone.");
+			west();
+		} else if (lastMove.equalsIgnoreCase("W")) {
+			System.out.println("Move undone.");
+			east();
+		} else {
+			System.out.println("This move cannot be undone.");
+		}
+	}
+
+	/**
 	 * Reset the puzzle state to the initial puzzle screen
 	 */
 	public void clearPuzzle() {
-		System.out.println("\n\nResetting puzzle to initial state");
+		System.out.println("\n\nResetting puzzle to initial state.");
 		genGame();
+	}
+
+	/**
+	 * Save puzzle state to file
+	 */
+	public void savePuzzle() {
+		if (puzzle == null) {
+			System.out.println("No game available to save.");
+		} else {
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss");
+			LocalDateTime now     = LocalDateTime.now();
+			System.out.println(
+				"Provide name of game file." +
+				"If an invalid input is given, the game will be saved as `puzzle-YYYY-MM-DD-HHMMSS`."
+			);
+			String givenInput = getCommand();
+			String filename   = null;
+			if (givenInput.equalsIgnoreCase("")){
+				filename = "puzzle-" + dtf.format(now);
+			} else {
+				filename = givenInput;
+			}
+			String filepath = System.getenv("WORKDIR") + "/snapshot/" + filename;
+
+			try (PrintStream out = new PrintStream(new FileOutputStream(filepath))) {
+				out.print(puzzle.toString());
+				System.out.println("Puzzle saved in: " + filepath + "\n");
+			} catch (FileNotFoundException e){
+				throw new SokobanException("File not found" + e);
+			}
+		}
 	}
 
 	/**
@@ -292,26 +346,6 @@ public class SokobanTextUI {
 	}
 
 	/**
-	 * Save puzzle state to file
-	 */
-	public void savePuzzle() {
-		if (puzzle == null) {
-			System.out.println("No game available to save.");
-		} else {
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss");
-			LocalDateTime now = LocalDateTime.now();
-			String filename = System.getenv("WORKDIR") + "/snapshot/puzzle-" + dtf.format(now);
-
-			try (PrintStream out = new PrintStream(new FileOutputStream(filename))) {
-				out.print(puzzle.toString());
-				System.out.println("Puzzle saved in: " + filename + "\n");
-			} catch (FileNotFoundException e){
-				throw new SokobanException("File not found" + e);
-			}
-		}
-	}
-
-	/**
 	 * Give player the option of saving the game before quitting
 	 */
 	public void quitPuzzle() {
@@ -323,19 +357,17 @@ public class SokobanTextUI {
 		if (response.equalsIgnoreCase("Y")){
 			savePuzzle();
 		} else if (response.equalsIgnoreCase("N")) {
-			System.out.println("Game will not be saved before quitting");
+			System.out.println("Game will not be saved before quitting.");
 		} else {
-			System.out.println("Unknown option provided ("+ response + ")");
+			System.out.println("Unknown option provided ("+ response + ").");
 		}
-		System.out.println("Program closing down");
+		System.out.println("Program shutting down.");
 		System.exit(0);
 	}
 
 	public static void main(String[] args) {
 		SokobanTextUI ui = new SokobanTextUI();
 		ui.initMenu();
-		// ui.newGame();
-		// ui.loadSavedPuzzle();
 	}
 
 	/**
@@ -353,6 +385,7 @@ public class SokobanTextUI {
 	private Player  player        = null;
 	private String  screenFile    = null;
 	private String  screenPath    = null;
+	private String  lastMove      = null;
 
 	private static Integer minScreen    = 1;
 	private static Integer maxScreen    = 90;
