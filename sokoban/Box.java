@@ -1,10 +1,9 @@
-package sokoban.actions;
+package sokoban;
 
 /**
  * A box in a Sokoban puzzle.
  *
  * @author Dr Mark C. Sinclair
- * @author Dr Kelechi Berquist
  * @version September 2021
  */
 public class Box extends Occupant {

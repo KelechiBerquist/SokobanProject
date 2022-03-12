@@ -12,7 +12,9 @@ cd $WORKDIR
 # echo
 # echo
 
-javac --class-path $CLASSPATH ./sokoban/actions/*.java -Xdiags:verbose
-javac --class-path $CLASSPATH ./sokoban/ui/*.java -Xdiags:verbose
+javac --class-path $CLASSPATH ./sokoban/*.java -Xdiags:verbose
 
-java sokoban.ui.SokobanTextUI
+# java sokoban.SokobanTextUI
+java sokoban.SokobanGUI
+
+rm $WORKDIR"/sokoban/*.class"

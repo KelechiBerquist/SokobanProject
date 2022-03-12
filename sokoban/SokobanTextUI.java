@@ -1,4 +1,4 @@
-package sokoban.ui;
+package sokoban;
 
 import java.io.*;
 import java.util.*;
@@ -6,11 +6,11 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
-import sokoban.actions.Sokoban;
-import sokoban.actions.SokobanException;
-import sokoban.actions.RandomPlayer;
-import sokoban.actions.Player;
-import sokoban.actions.Direction;
+import sokoban.Sokoban;
+import sokoban.SokobanException;
+import sokoban.RandomPlayer;
+import sokoban.Player;
+import sokoban.Direction;
 
 /**
  * A text-based user interface for a Sokoban puzzle.
@@ -42,14 +42,14 @@ public class SokobanTextUI {
 	 * Display the initial user menu of options
 	 */
 	private void displayInitMenu()  {
-		System.out.println("Commands are:");
+		System.out.println("To begin playing game, select from the options below.\nOptions are:");
 		System.out.println("   Start new puzzle       [New]");
 		System.out.println("   Load from file        [Load]");
 		System.out.println("   To end program        [Quit]");
 	}
 
 	/**
-	 * Execute the initial user command string
+	 * Execute the initialuser command string
 	 *
 	 * @param command the user command string
 	 */
@@ -205,8 +205,9 @@ public class SokobanTextUI {
 	 */
 	public void initGameAttr() {
 		Integer randomNum = ThreadLocalRandom.current().nextInt(minScreen, maxScreen + 1);
+
 		screenFile = "screen." + randomNum.toString();
-		screenPath = System.getenv("WORKDIR") + "/screens/" + screenFile;
+		screenPath = workDir + "/screens/" + screenFile;
 	}
 
 	/**
@@ -277,7 +278,7 @@ public class SokobanTextUI {
 			} else {
 				filename = givenInput;
 			}
-			String filepath = System.getenv("WORKDIR") + "/snapshot/" + filename;
+			String filepath = workDir + "/snapshot/" + filename;
 
 			try (PrintStream out = new PrintStream(new FileOutputStream(filepath))) {
 				out.print(puzzle.toString());
@@ -293,7 +294,7 @@ public class SokobanTextUI {
 	 */
 	public void loadSavedPuzzle() {
 		System.out.println("\n\nLocating saved game files.");
-		File f = new File(System.getenv("WORKDIR") + "/snapshot");
+		File f   = new File(workDir + "/snapshot");
 		String[] filePaths = f.list();
 
 		if (filePaths.length == 0){
@@ -310,8 +311,8 @@ public class SokobanTextUI {
 			Integer optionInt = 0;
 			for (String filepath: filePaths){
 				optionInt++;
-				String formattedPath = "    " + String.format("%-30s", filepath);
-				String formattedOption = String.format("[%d]", optionInt);
+				String formattedPath   =  "    " + String.format("%-30s", filepath);
+				String formattedOption =  String.format("[%d]", optionInt);
 				System.out.println(formattedPath + formattedOption);
 			}
 			/**
@@ -326,7 +327,7 @@ public class SokobanTextUI {
 					 * If valid integer was provided, generate game using saved file
 					 */
 					screenFile = filePaths[gameIndex-1];
-					screenPath = System.getenv("WORKDIR") + "/snapshot/" + screenFile;
+					screenPath = workDir + "/snapshot/" + screenFile;
 					genGame();
 				} else {
 					/**
@@ -387,6 +388,7 @@ public class SokobanTextUI {
 	private String  screenPath    = null;
 	private String  lastMove      = null;
 
+	private static String  workDir      = System.getProperty("user.dir");
 	private static Integer minScreen    = 1;
 	private static Integer maxScreen    = 90;
 	private static boolean traceOn      = false; // for debugging

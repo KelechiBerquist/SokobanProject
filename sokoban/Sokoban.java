@@ -1,4 +1,4 @@
-package sokoban.actions;
+package sokoban;
 
 import java.io.*;
 import java.util.*;
@@ -7,7 +7,6 @@ import java.util.*;
  * A Sokoban puzzle.
  *
  * @author Dr Mark C. Sinclair
- * @author Dr Kelechi Berquist
  * @version September 2021
  */
 @SuppressWarnings("deprecation")
