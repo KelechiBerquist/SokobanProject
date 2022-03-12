@@ -90,6 +90,7 @@ public class SokobanGUI  {
 		fileList = readFileInList();
 		puzzle = new Sokoban(new File(screenPath));
 		player = new RandomPlayer();
+		currGameState = puzzle.toString();
 	}
 
 
@@ -301,7 +302,9 @@ public class SokobanGUI  {
 	private String  screenPath    = null;
 	private String  lastMove      = null;
 
-	private ArrayList <String> fileList   = null;
+	private ArrayList <String> fileList        = null;
+	private ArrayList <String> currGameState   = null;
+	private ArrayList <String> prevGameState   = null;
 
 	private static Integer imgHeight     = 20;
 	private static Integer imgWidth      = 20;
