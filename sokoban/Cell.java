@@ -1,4 +1,4 @@
-package sokoban.actions;
+package sokoban;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package sokoban.actions;
+package sokoban;
 
 import java.util.*;
 
@@ -6,7 +6,6 @@ import java.util.*;
  * A player interface for a Sokoban puzzle.
  *
  * @author Dr Mark C. Sinclair
- * @author Dr Kelechi Berquist
  * @version September 2021
  */
 public interface Player {

@@ -1,4 +1,4 @@
-package sokoban.actions;
+package sokoban;
 
 import java.io.*;
 import java.util.*;
@@ -8,10 +8,10 @@ import java.util.*;
  *
  * @author Dr Mark C. Sinclair
  * @author Dr Kelechi Berquist
- * @version September 2021
+ * @version March 2022
  */
 @SuppressWarnings("deprecation")
-public class Sokoban extends Observable {
+public class Sokoban extends Observable implements Cloneable {
 	/**
 	 * Construct a Sokoban puzzle from a standard Sokoban screen file
 	 *
@@ -27,34 +27,43 @@ public class Sokoban extends Observable {
 	 * @param screen the screen file as a String
 	 */
 	public Sokoban(String screen) {
+		fromScreen(screen);
+		startScreen = screen;
+	}
+
+	/**
+	 * Edit the content of Sokoban puzzle from a given
+	 * screen file passed as a String
+	 *
+	 * @param screen the screen file as a String
+	 */
+	private void fromScreen(String screen) {
 		if (screen == null)
 			throw new IllegalArgumentException("screen cannot be null");
-		startScreen            = screen;
-		Scanner           scnr = null;
-		ArrayList<String> lines = new ArrayList<>();
-		scnr = new Scanner(screen);
-		while (scnr.hasNextLine()) {
-			String line = scnr.nextLine();
-			if (line.length() > 0) {
-				lines.add(line);
-				numRows++;
-				if (line.length() > numCols)
-					numCols = line.length();
+
+		ArrayList<String> lines = Helpers.listFromString(screen);
+		numRows  = lines.size();
+		numCols  = 0;
+		for (String s: lines){
+			if (s.length() > numCols) {
+				numCols = s.length();
 			}
 		}
-		scnr.close();
-		cells = new Cell[numRows][numCols];
+		cells    = new Cell[numRows][numCols];
+		displays = new String[numRows][numCols];
 		for (int row=0; row<numRows; row++) {
 			String line = lines.get(row);
 			for (int col=0; col<numCols; col++) {
 				char display = (col < line.length()) ? line.charAt(col) : Sokoban.EMPTY;
 				cells[row][col] = new Cell(display, this, row, col);
+				displays[row][col] = Character.toString(display);
 				if (display == ACTOR || display == TARGET_ACTOR)
 					actorCell = cells[row][col];
 			}
 		}
 		checkValid();
 	}
+
 
 	/**
 	 * Some basic validity checks
@@ -66,20 +75,10 @@ public class Sokoban extends Observable {
 	}
 
 	/**
-	 * Reset to the starting state
+	 * Reset game to a given state
+	 * @param lines an ArrayList of strings corresponding to the game state
 	 */
-	public void clear() {
-		if (startScreen == null)
-			throw new IllegalStateException("startScreen cannot be null");
-		Scanner           scnr = null;
-		ArrayList<String> lines = new ArrayList<>();
-		scnr = new Scanner(startScreen);
-		while (scnr.hasNextLine()) {
-			String line = scnr.nextLine();
-			if (line.length() > 0)
-				lines.add(line);
-		}
-		scnr.close();
+	private void resetToPoint(ArrayList<String> lines) {
 		for (int row=0; row<numRows; row++) {
 			String line = lines.get(row);
 			for (int col=0; col<numCols; col++) {
@@ -95,6 +94,26 @@ public class Sokoban extends Observable {
 			}
 		}
 		checkValid();
+	}
+
+	/**
+	 * Reset to the starting state
+	 */
+	public void clear() {
+		if (startScreen == null)
+			throw new IllegalStateException("startScreen cannot be null");
+		ArrayList<String> lines = Helpers.listFromString(startScreen);
+		resetToPoint(lines);
+	}
+
+	/**
+	 * Undo player move
+	 */
+	public void undo() {
+		if (prevScreen == null)
+			throw new IllegalStateException("Previous screen cannot be null");
+		ArrayList<String> lines = Helpers.listFromString(prevScreen);
+		resetToPoint(lines);
 	}
 
 	/**
@@ -232,6 +251,7 @@ public class Sokoban extends Observable {
 	 * @param dir the direction to move
 	 */
 	public void move(Direction dir) {
+		prevScreen = toString();
 		if (!canMove(dir))
 			throw new IllegalArgumentException("cannot move "+dir);
 		Cell oldActorCell = actorCell;
@@ -248,6 +268,7 @@ public class Sokoban extends Observable {
 			setChanged();
 			notifyObservers(next); // to where box may have been pushed
 		}
+		setDisplay();
 	}
 
 	/**
@@ -264,6 +285,26 @@ public class Sokoban extends Observable {
 			b.append("\n");
 		}
 		return b.toString();
+	}
+
+	/**
+	 * Sets a list of char representation of sokoban puzzle
+	 */
+	public void setDisplay() {
+		for (int row=0; row<numRows; row++) {
+			for (int col=0; col<numCols; col++){
+				displays[row][col] = Character.toString(cells[row][col].getDisplay());
+			}
+		}
+	}
+
+	/**
+	 * Returns a list of char representation of sokoban puzzle
+	 *
+	 * @return the String[][] representation
+	 */
+	public String[][] getDisplay() {
+		return displays;
 	}
 
 	/**
@@ -302,6 +343,18 @@ public class Sokoban extends Observable {
 	}
 
 	/**
+	 * Allows cloning of class object
+	 */
+	public Object clone() {
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException err) {
+			System.out.println("Puzzle object cannot be cloned");
+			return new Object();
+		}
+	}
+
+	/**
 	 * A trace method for debugging (active when traceOn is true)
 	 *
 	 * @param s the string to output
@@ -322,8 +375,10 @@ public class Sokoban extends Observable {
 	private int      numRows     = 0;
 	private int      numCols     = 0;
 	private Cell     actorCell   = null;
-	private Cell[][] cells       = null;
+	private Cell[][]    cells       = null;
+	private String[][]  displays    = null;
 	private String   startScreen = null;
+	private String   prevScreen = null;
 
 	private static boolean traceOn = false; // for debugging
 }

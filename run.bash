@@ -8,11 +8,13 @@ export CLASSPATH=$WORKDIR:$WORKDIR/*:$WORKDIR/*/*:$WORKDIR/*/*/*:$CLASSPATH
 
 cd $WORKDIR
 
+rm  ./sokoban/*.class
+
 # echo
 # echo
 # echo
 
-javac --class-path $CLASSPATH ./sokoban/actions/*.java -Xdiags:verbose
-javac --class-path $CLASSPATH ./sokoban/ui/*.java -Xdiags:verbose
+javac --class-path $CLASSPATH ./sokoban/*.java -Xdiags:verbose
 
-java sokoban.ui.SokobanTextUI
+# java sokoban.SokobanTextUI
+java sokoban.SokobanGUI

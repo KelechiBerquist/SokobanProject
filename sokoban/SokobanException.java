@@ -1,10 +1,9 @@
-package sokoban.actions;
+package sokoban;
 
 /**
  * A problem-specific run time exception for a Sokoban puzzle.
  *
  * @author Dr Mark C. Sinclair
- * @author Dr Kelechi Berquist
  * @version September 2021
  */
 @SuppressWarnings("serial")

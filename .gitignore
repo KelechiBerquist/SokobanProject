@@ -1,12 +1,2 @@
-sokoban/actions/Actor.class
-sokoban/actions/Box.class
-sokoban/actions/Cell.class
-sokoban/actions/Direction$1.class
-sokoban/actions/Direction.class
-sokoban/actions/Occupant.class
-sokoban/actions/Player.class
-sokoban/actions/RandomPlayer.class
-sokoban/actions/Sokoban.class
-sokoban/actions/SokobanException.class
-sokoban/actions/Wall.class
-sokoban/ui/SokobanTextUI.class
+sokoban/*.class
+sokoban/*/*.class
