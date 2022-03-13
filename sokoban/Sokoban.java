@@ -7,10 +7,11 @@ import java.util.*;
  * A Sokoban puzzle.
  *
  * @author Dr Mark C. Sinclair
- * @version September 2021
+ * @author Dr Kelechi Berquist
+ * @version March 2022
  */
 @SuppressWarnings("deprecation")
-public class Sokoban extends Observable {
+public class Sokoban extends Observable implements Cloneable {
 	/**
 	 * Construct a Sokoban puzzle from a standard Sokoban screen file
 	 *
@@ -26,22 +27,28 @@ public class Sokoban extends Observable {
 	 * @param screen the screen file as a String
 	 */
 	public Sokoban(String screen) {
+		fromScreen(screen);
+		startScreen = screen;
+	}
+
+	/**
+	 * Edit the content of Sokoban puzzle from a given
+	 * screen file passed as a String
+	 *
+	 * @param screen the screen file as a String
+	 */
+	private void fromScreen(String screen) {
 		if (screen == null)
 			throw new IllegalArgumentException("screen cannot be null");
-		startScreen            = screen;
-		Scanner           scnr = null;
-		ArrayList<String> lines = new ArrayList<>();
-		scnr = new Scanner(screen);
-		while (scnr.hasNextLine()) {
-			String line = scnr.nextLine();
-			if (line.length() > 0) {
-				lines.add(line);
-				numRows++;
-				if (line.length() > numCols)
-					numCols = line.length();
+
+		ArrayList<String> lines = Helpers.listFromString(screen);
+		numRows  = lines.size();
+		numCols  = 0;
+		for (String s: lines){
+			if (s.length() > numCols) {
+				numCols = s.length();
 			}
 		}
-		scnr.close();
 		cells    = new Cell[numRows][numCols];
 		displays = new String[numRows][numCols];
 		for (int row=0; row<numRows; row++) {
@@ -57,6 +64,7 @@ public class Sokoban extends Observable {
 		checkValid();
 	}
 
+
 	/**
 	 * Some basic validity checks
 	 */
@@ -67,20 +75,10 @@ public class Sokoban extends Observable {
 	}
 
 	/**
-	 * Reset to the starting state
+	 * Reset game to a given state
+	 * @param lines an ArrayList of strings corresponding to the game state
 	 */
-	public void clear() {
-		if (startScreen == null)
-			throw new IllegalStateException("startScreen cannot be null");
-		Scanner           scnr = null;
-		ArrayList<String> lines = new ArrayList<>();
-		scnr = new Scanner(startScreen);
-		while (scnr.hasNextLine()) {
-			String line = scnr.nextLine();
-			if (line.length() > 0)
-				lines.add(line);
-		}
-		scnr.close();
+	private void resetToPoint(ArrayList<String> lines) {
 		for (int row=0; row<numRows; row++) {
 			String line = lines.get(row);
 			for (int col=0; col<numCols; col++) {
@@ -96,6 +94,26 @@ public class Sokoban extends Observable {
 			}
 		}
 		checkValid();
+	}
+
+	/**
+	 * Reset to the starting state
+	 */
+	public void clear() {
+		if (startScreen == null)
+			throw new IllegalStateException("startScreen cannot be null");
+		ArrayList<String> lines = Helpers.listFromString(startScreen);
+		resetToPoint(lines);
+	}
+
+	/**
+	 * Undo player move
+	 */
+	public void undo() {
+		if (prevScreen == null)
+			throw new IllegalStateException("Previous screen cannot be null");
+		ArrayList<String> lines = Helpers.listFromString(prevScreen);
+		resetToPoint(lines);
 	}
 
 	/**
@@ -233,6 +251,7 @@ public class Sokoban extends Observable {
 	 * @param dir the direction to move
 	 */
 	public void move(Direction dir) {
+		prevScreen = toString();
 		if (!canMove(dir))
 			throw new IllegalArgumentException("cannot move "+dir);
 		Cell oldActorCell = actorCell;
@@ -249,7 +268,7 @@ public class Sokoban extends Observable {
 			setChanged();
 			notifyObservers(next); // to where box may have been pushed
 		}
-		setDisplay()
+		setDisplay();
 	}
 
 	/**
@@ -324,6 +343,18 @@ public class Sokoban extends Observable {
 	}
 
 	/**
+	 * Allows cloning of class object
+	 */
+	public Object clone() {
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException err) {
+			System.out.println("Puzzle object cannot be cloned");
+			return new Object();
+		}
+	}
+
+	/**
 	 * A trace method for debugging (active when traceOn is true)
 	 *
 	 * @param s the string to output
@@ -347,6 +378,7 @@ public class Sokoban extends Observable {
 	private Cell[][]    cells       = null;
 	private String[][]  displays    = null;
 	private String   startScreen = null;
+	private String   prevScreen = null;
 
 	private static boolean traceOn = false; // for debugging
 }

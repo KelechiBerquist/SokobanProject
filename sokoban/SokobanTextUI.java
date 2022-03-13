@@ -42,10 +42,13 @@ public class SokobanTextUI {
 	 * Display the initial user menu of options
 	 */
 	private void displayInitMenu()  {
-		System.out.println("To begin playing game, select from the options below.\nOptions are:");
-		System.out.println("   Start new puzzle       [New]");
-		System.out.println("   Load from file        [Load]");
-		System.out.println("   To end program        [Quit]");
+		System.out.println(
+			"Enter command using the keyboard.\n" +
+			"Possible commands:\n" +
+			"      New Game                 [A]\n" +
+			"      Load Saved Game          [L]\n" +
+			"      Quit Game                [Q]\n"
+		);
 	}
 
 	/**
@@ -54,11 +57,11 @@ public class SokobanTextUI {
 	 * @param command the user command string
 	 */
 	private void initExecute(String command) {
-		if (command.equalsIgnoreCase("Quit")) {
+		if (command.equalsIgnoreCase("Q")) {
 			quitPuzzle();
-		} else if (command.equalsIgnoreCase("New")) {
+		} else if (command.equalsIgnoreCase("A")) {
 			newGame();
-		} else if (command.equalsIgnoreCase("Load")) {
+		} else if (command.equalsIgnoreCase("L")) {
 			loadSavedPuzzle();
 		} else {
 			System.out.println("Unknown command (" + command + ")");
@@ -75,9 +78,9 @@ public class SokobanTextUI {
 		String command = "";
 		System.out.println("Loading game from the file: " + screenFile);
 		System.out.print(puzzle);
-		while (!command.equalsIgnoreCase("Quit") && !puzzle.onTarget())  {
+		while (!command.equalsIgnoreCase("Q") && !puzzle.onTarget())  {
 			displayMenu();
-			lastMove = command;
+			lastCommand = command;
 			command = getCommand();
 			execute(command);
 			System.out.print("\n" + puzzle);
@@ -91,18 +94,21 @@ public class SokobanTextUI {
 	 * Display the user menu
 	 */
 	private void displayMenu()  {
-		System.out.println("Commands are:");
-		System.out.println("   Move North               [N]");
-		System.out.println("   Move South               [S]");
-		System.out.println("   Move East                [E]");
-		System.out.println("   Move West                [W]");
-		System.out.println("   Player move              [P]");
-		System.out.println("   Undo move                [U]");
-		System.out.println("   Start new puzzle       [New]");
-		System.out.println("   Restart this puzzle  [Clear]");
-		System.out.println("   Save to file          [Save]");
-		System.out.println("   Load from file        [Load]");
-		System.out.println("   To end program        [Quit]");
+		System.out.println(
+			"Enter command using the keyboard.\n" +
+			"Possible commands:\n" +
+			"      Move North               [N]\n" +
+			"      Move South               [S]\n" +
+			"      Move East                [E]\n" +
+			"      Move West                [W]\n" +
+			"      Player Move              [P]\n" +
+			"      Undo Move                [U]\n" +
+			"      New Game                 [A]\n" +
+			"      Restart Game             [R]\n" +
+			"      Save Game                [V]\n" +
+			"      Load Saved Game          [L]\n" +
+			"      Quit Game                [Q]\n"
+		);
 	}
 
 	/**
@@ -121,7 +127,7 @@ public class SokobanTextUI {
 	 * @param command the user command string
 	 */
 	private void execute(String command) {
-		if (command.equalsIgnoreCase("Quit")) {
+		if (command.equalsIgnoreCase("Q")) {
 			quitPuzzle();
 		} else if (command.equalsIgnoreCase("N")) {
 			north();
@@ -135,13 +141,13 @@ public class SokobanTextUI {
 			playerMove();
 		} else if (command.equalsIgnoreCase("U")) {
 			undoMove();
-		} else if (command.equalsIgnoreCase("Clear")) {
+		} else if (command.equalsIgnoreCase("R")) {
 			clearPuzzle();
-		} else if (command.equalsIgnoreCase("New")) {
+		} else if (command.equalsIgnoreCase("A")) {
 			newGame();
-		} else if (command.equalsIgnoreCase("Save")) {
+		} else if (command.equalsIgnoreCase("V")) {
 			savePuzzle();
-		} else if (command.equalsIgnoreCase("Load")) {
+		} else if (command.equalsIgnoreCase("L")) {
 			loadSavedPuzzle();
 		} else {
 			System.out.println("Unknown command (" + command + ")");
@@ -196,8 +202,9 @@ public class SokobanTextUI {
 			return;
 		}
 		puzzle.move(dir);
-		if (puzzle.onTarget())
+		if (puzzle.onTarget()){
 			System.out.println("game won!");
+		}
 	}
 
 	/**
@@ -232,19 +239,19 @@ public class SokobanTextUI {
 	 * Undo last player move if move is E, W, N, S
 	 */
 	public void undoMove() {
-		System.out.println("\n\nAttempting to undo move.");
-		if (lastMove.equalsIgnoreCase("N")) {
-			System.out.println("Move undone.");
-			south();
-		} else if (lastMove.equalsIgnoreCase("S")) {
-			System.out.println("Move undone.");
-			north();
-		} else if (lastMove.equalsIgnoreCase("E")) {
-			System.out.println("Move undone.");
-			west();
-		} else if (lastMove.equalsIgnoreCase("W")) {
-			System.out.println("Move undone.");
-			east();
+		if (
+			lastCommand.equalsIgnoreCase("N") ||
+			lastCommand.equalsIgnoreCase("S") ||
+			lastCommand.equalsIgnoreCase("E") ||
+			lastCommand.equalsIgnoreCase("W") ||
+			lastCommand.equalsIgnoreCase("P")
+		) {
+			try {
+				puzzle.undo();
+				System.out.println("Move undone.");
+			} catch (IllegalStateException ex) {
+				System.out.println("No previous moves available!");
+			}
 		} else {
 			System.out.println("This move cannot be undone.");
 		}
@@ -254,8 +261,12 @@ public class SokobanTextUI {
 	 * Reset the puzzle state to the initial puzzle screen
 	 */
 	public void clearPuzzle() {
-		System.out.println("\n\nResetting puzzle to initial state.");
-		genGame();
+		try {
+			puzzle.clear();
+			System.out.println("\n\nResetting puzzle to initial state.");
+		} catch (IllegalStateException ex) {
+			System.out.println("No initial game state available!");
+		}
 	}
 
 	/**
@@ -381,12 +392,12 @@ public class SokobanTextUI {
 			System.out.println("trace: " + s);
 	}
 
-	private Scanner scnr          = null;
-	private Sokoban puzzle        = null;
-	private Player  player        = null;
-	private String  screenFile    = null;
-	private String  screenPath    = null;
-	private String  lastMove      = null;
+	private Scanner scnr     = null;
+	private Sokoban puzzle   = null;
+	private Player  player   = null;
+	private String  screenFile   = null;
+	private String  screenPath   = null;
+	private String  lastCommand  = null;
 
 	private static String  workDir      = System.getProperty("user.dir");
 	private static Integer minScreen    = 1;

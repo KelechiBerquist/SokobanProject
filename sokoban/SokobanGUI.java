@@ -1,32 +1,15 @@
 package sokoban;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileNotFoundException;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.Icon;
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JOptionPane;
-import javax.swing.JFileChooser;
-import javax.swing.ImageIcon;
-// import javax.swing.Image;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.concurrent.ThreadLocalRandom;
+import java.io.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import java.util.*;
+import java.util.concurrent.*;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
-import sokoban.SokobanTextUI;
 import sokoban.Sokoban;
 import sokoban.SokobanException;
 import sokoban.RandomPlayer;
@@ -37,6 +20,7 @@ import sokoban.Direction;
  * A text-based user interface for a Sokoban puzzle.
  *
  * @author Dr Kelechi Berquist
+ * @author Dr Mark C. Sinclair
  * @version March 2022
  */
 public class SokobanGUI  {
@@ -45,8 +29,6 @@ public class SokobanGUI  {
 	 * Default constructor
 	 */
 	public SokobanGUI() {
-		scnr = new Scanner(System.in);
-
 		Image brickImg         = new ImageIcon(
 			workDir + "/image/brick-wall.png"
 		).getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
@@ -81,206 +63,336 @@ public class SokobanGUI  {
 		symbolMap.put(".", new ImageIcon(targetImg));
 		symbolMap.put("+", new ImageIcon(humanTargetImg));
 		symbolMap.put("*", new ImageIcon(bullseyeImg));
+
+		appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		appFrame.setLayout(new BorderLayout(50, 50));
+		appFrame.setSize(frameHeight, frameWidth);
+	}
+
+
+	/**
+	 * Set up new game
+	 */
+	public void newGame() {
+		System.out.println("\n\nBeginning new game");
+		initGameAttr();
+		genGame();
 	}
 
 	/**
 	 *
 	 */
-	public void initGame() {
-		fileList = readFileInList();
-		puzzle = new Sokoban(new File(screenPath));
-		player = new RandomPlayer();
-		currGameState = puzzle.toString();
+	public void initGameAttr() {
+		Integer randomNum   =   ThreadLocalRandom.current().nextInt(minScreen, maxScreen + 1);
+		screenFile          =   "screen." + randomNum.toString();
+		screenPath          =   workDir + "/screens/" + screenFile;
+		loadFile            =   new File(screenPath);
 	}
 
-
 	/**
-	 * Generate game from currently available class variables
+	 *
 	 */
 	public void genGame() {
-
-	}
-
-	/**
-	 *
-	 */
-	public void generateWindow() {
-		initGame();
+		puzzle = new Sokoban(loadFile);
+		player = new RandomPlayer();
 		genFrame();
-		// String myName = genInputPanel("What is your name?");
-		// System.out.println(myName);
 	}
-
 
 	/**
 	 *
 	 */
 	public void genFrame() {
-		JMenuBar menuBar = genMenuBar();
-		JPanel   panel   = genFooter();
-		JPanel   board   = genBoard();
-		JFrame   frame   = new JFrame("Sokoban GUI");
+		appFrame.getContentPane().removeAll();
+		appFrame.invalidate();
+		appFrame.revalidate();
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new BorderLayout(100, 50));
-		frame.setSize(frameHeight, frameWidth);
-		frame.getContentPane().add(BorderLayout.SOUTH, panel);
-		frame.getContentPane().add(BorderLayout.CENTER, board);
-		frame.getContentPane().add(BorderLayout.NORTH, menuBar);
-		frame.setVisible(true);
+		genBoard();
+		genOutMsgPane();
+		genAdminBtns();
+		genPlayBtns();
+
+		appFrame.getContentPane().add(adminPanel);
+		appFrame.setLayout(new BoxLayout(appFrame.getContentPane(), BoxLayout.PAGE_AXIS));
+		appFrame.getContentPane().add(boardPanel);
+		appFrame.getContentPane().add(playPanel);
+		appFrame.getContentPane().add(outputPane);
+		appFrame.pack();
+		appFrame.setVisible(true);
 	}
-
 
 	/**
 	 *
 	 */
-	public ArrayList<String> readFileInList() {
-		Integer randomNum = ThreadLocalRandom.current().nextInt(minScreen, maxScreen + 1);
-
-		screenFile = "screen." + randomNum.toString();
-		screenPath = workDir + "/screens/" + screenFile;
-
-		System.out.println("File to be read:" + screenPath);
-		ArrayList<String> screenList = new ArrayList<String>();
-		try {
-			Scanner scanner = new Scanner(new FileReader(screenPath)).useDelimiter("\n");
-			while (scanner.hasNext()){
-				screenList.add(scanner.next());
-			}
-			scanner.close();
-		} catch (FileNotFoundException ex) {
-			System.out.println("File not found. Exiting program");
+	public void genOutMsgPane() {
+		outputPane = new JTextPane();
+		JScrollPane scrollPane = new JScrollPane(outputPane);
+		outputPane.setEditable(false);
+		if (!(outMsg).equals("")){
+			outputPane.setMargin( new Insets(10,10,10,10) );
+			outputPane.setBackground(new Color(224, 255, 255));
+			outputPane.setForeground(new Color(43, 27, 23, 255));
+			outputPane.setFont(appFont);
+			outputPane.setText(outMsg);
+		} else {
+			outputPane.setMargin( new Insets(10,10,10,10) );
+			outputPane.setBackground(new Color(224, 255, 255));
+			outputPane.setForeground(outputPane.getBackground());
 		}
-		return screenList;
 	}
 
 	/**
 	 *
 	 */
-	public JPanel genBoard() {
-		JPanel board = new JPanel();
-		for (Integer i = 0; i < numBtnRows; i++){
-			Integer countBox = 0;
-			String row = null;
-			if ( i < fileList.size()){
-				row = fileList.get(i);
-				System.out.println(row);
+	public void genBoard() {
+		ArrayList<String> currGameState = Helpers.listFromString(puzzle.toString());
+		boardPanel = new JPanel();
+		boardPanel.setSize(frameHeight-10, frameWidth-10);
+		boardPanel.setLayout(new GridLayout(numGrid, numGrid));
+
+		Border paneEdge = BorderFactory.createEmptyBorder(30,200,0,0);
+		boardPanel.setBorder(paneEdge);
+
+		for (Integer i = 0; i < numGrid; i++){
+			Integer  countBox = 0;
+			String   row      = null;
+			if ( i < currGameState.size()){
+				row = currGameState.get(i);
+				// System.out.println(row);
 				if (row.length() > 0){
 					countBox = row.length();
 				}
 			}
 
-			for (Integer j = 0; j < numBtnCols; j++){
+			for (Integer j = 0; j < numGrid; j++){
 				JButton button = null;
 				button = new JButton();
 
-				if (countBox != 0 && j >= leftMargin && j < countBox + leftMargin) {
-					String theChar =  Character.toString(row.charAt(j - leftMargin));
-					if (!(theChar.equalsIgnoreCase(" "))){
+				if (countBox != 0 && j >= 0 && j < countBox) {
+					String theChar =  Character.toString(row.charAt(j));
+					if (!(puzzle.onTarget() | theChar.equalsIgnoreCase(" "))){
 						button.setIcon(symbolMap.get(theChar));
 						button.setMargin(new Insets(0, 0, 0, 0));
-
 					}
 				}
 				button.setOpaque(false);
 				button.setContentAreaFilled(false);
 				button.setBorderPainted(false);
 				button.setBorder(null);
-				board.add(button);
+				boardPanel.add(button);
 			}
 		}
-		board.setSize(frameHeight-10, frameWidth-10);
-		board.setLayout(new GridLayout(numBtnRows, numBtnCols));
-
-		return board;
 	}
 
 	/**
 	 *
 	 */
-	public JPanel genFooter() {
-		JPanel panel = new JPanel();
+	public void genAdminBtns() {
+		JButton quitBtn     = new JButton("Quit");
+		JButton saveBtn     = new JButton("Save");
+		JButton restartBtn  = new JButton("Restart");
+		JButton newBtn      = new JButton("New");
+		JButton loadBtn     = new JButton("Load");
 
-		JButton undoBtn        =  new JButton("Undo Move");
-		JButton randMoveBtn    =  new JButton("Random Move");
-		JButton clearBtn       =  new JButton("Restart Game");
-		JButton newBtn         =  new JButton("New Game");
-		JButton quitBtn        =  new JButton("Quit Game");
+		quitBtn.addActionListener(e -> {appFrame.dispose();});
+		saveBtn.addActionListener(e -> {savePuzzle();});
+		restartBtn.addActionListener(e -> {clearPuzzle();});
+		newBtn.addActionListener(e -> {newGame();});
+		loadBtn.addActionListener(e -> {loadSavedPuzzle();});
 
-		panel.add(undoBtn);
-		panel.add(randMoveBtn);
-		panel.add(clearBtn);
-		panel.add(newBtn);
-		panel.add(quitBtn);
-
-		// board.setSize(frameHeight-100, frameWidth-100);
-		// board.setLayout(new GridLayout(numBtnRows, numBtnCols));
-
-		return panel;
-	}
-
-	/**
-	 * Given a frame, this generates a panel that requests information from
-	 * user and returns user reponse
-	 * @param f the frame where the input will be displayed
-	 * @param msg the message displayed to the user
-	 * @return input returned from the user
-	 */
-	public String genInputPanel(JFrame f, String msg) {
-		String input = JOptionPane.showInputDialog(f, msg);
-		return input;
-	}
-
-	/**
-	 * This generates a frame and panel that requests information from
-	 * user and returns user reponse
-	 * @param msg the message displayed to the user
-	 * @return input returned from the user
-	 */
-	public String genInputPanel(String msg) {
-		JFrame f = new JFrame();
-		String input = JOptionPane.showInputDialog(f, msg);
-		return input;
+		adminPanel  =  new JPanel();
+		adminPanel.setLayout(new FlowLayout());
+		adminPanel.add(quitBtn);
+		adminPanel.add(saveBtn);
+		adminPanel.add(restartBtn);
+		adminPanel.add(newBtn);
+		adminPanel.add(loadBtn);
 	}
 
 	/**
 	 *
 	 */
-	public JMenuBar genMenuBar() {
-		JMenuBar menuBar = new JMenuBar();
+	public void genPlayBtns() {
+		JButton nMoveBtn   = new JButton("Move North");
+		JButton eMoveBtn   = new JButton("Move East");
+		JButton wMoveBtn   = new JButton("Move West");
+		JButton sMoveBtn   = new JButton("Move South");
+		JButton uMoveBtn   = new JButton("Undo Move");
+		JButton rMoveBtn   = new JButton("Random Move");
 
-		JMenu newGame    = new JMenu("New Game");
-		JMenu saveGame   = new JMenu("Save Game");
-		JMenu loadGame   = new JMenu("Load Saved Game");
+		nMoveBtn.addActionListener(e -> {move(Direction.NORTH);});
+		wMoveBtn.addActionListener(e -> {move(Direction.WEST);});
+		eMoveBtn.addActionListener(e -> {move(Direction.EAST);});
+		sMoveBtn.addActionListener(e -> {move(Direction.SOUTH);});
+		uMoveBtn.addActionListener(e -> {undoMove();});
+		rMoveBtn.addActionListener(e -> {playerMove();});
 
-		menuBar.add(newGame);
-		menuBar.add(saveGame);
-		menuBar.add(loadGame);
+		playPanel  =  new JPanel();
+		playPanel.setLayout(new FlowLayout());
+		playPanel.add(nMoveBtn);
+		playPanel.add(wMoveBtn);
+		playPanel.add(eMoveBtn);
+		playPanel.add(sMoveBtn);
+		playPanel.add(uMoveBtn);
+		playPanel.add(rMoveBtn);
 
-		return menuBar;
 	}
 
 	/**
+	 * Refresh frame and include output message
 	 *
+	 * @param command the user command string
 	 */
-	public void newGamePressed() {
-
+	private void refresh(String command) {
+		outMsg = command;
+		genFrame();
+		outMsg = "";
 	}
 
 	/**
-	 *
+	 * Move the actor according to the computer player's choice
 	 */
-	public void loadGameClicked(ActionEvent evnt) {
-		JFileChooser fileChoice = new JFileChooser();
+	private void playerMove() {
+		lastCommand = currCommand;
+		currCommand = "P";
+		Vector<Direction> choices = puzzle.canMove();
+		Direction         choice  = player.move(choices);
+		move(choice);
+	}
+
+	/**
+	 * If it is safe, move the actor to the next cell in a given direction
+	 *
+	 * @param dir the direction to move
+	 */
+	private void move(Direction dir) {
+		String msg       =   "";
+		String dirString =   dir.toString();
+		lastCommand      =   currCommand;
+		currCommand      =   Character.toString(dirString.charAt(0));
+
+		if (!puzzle.canMove(dir)) {
+			System.out.println("Invalid move.");
+			msg = "Invalid move.";
+		} else {
+			msg = "Moving " + dirString;
+			System.out.println("Moving " + dirString);
+			puzzle.move(dir);
+		}
+		if (puzzle.onTarget()){
+			System.out.println("Game Won!");
+			msg = "Game Won!";
+		}
+		refresh(msg);
+	}
+
+	/**
+	 * Undo last player move if move is E, W, N, S
+	 */
+	public void undoMove() {
+		lastCommand = currCommand;
+		currCommand = "U";
+		String msg  =  "";
+		if (
+			lastCommand.equalsIgnoreCase("N") ||
+			lastCommand.equalsIgnoreCase("S") ||
+			lastCommand.equalsIgnoreCase("E") ||
+			lastCommand.equalsIgnoreCase("W") ||
+			lastCommand.equalsIgnoreCase("P")
+		) {
+			try {
+				puzzle.undo();
+				System.out.println("Move undone.");
+				msg = "Move undone.";
+			} catch (IllegalStateException ex) {
+				System.out.println("No previous moves available!");
+				msg = "No previous moves available!";
+			}
+		} else {
+			System.out.println("This move cannot be undone.");
+			msg = "This move cannot be undone.";
+		}
+		refresh(msg);
+	}
+
+	/**
+	 * Reset the puzzle state to the initial puzzle screen
+	 */
+	public void clearPuzzle() {
+		lastCommand = currCommand;
+		currCommand = "C";
+		String msg  = "";
+		try {
+			puzzle.clear();
+			System.out.println("\n\nResetting puzzle to initial state.");
+			msg = "Resetting puzzle to initial state.";
+		} catch (IllegalStateException ex) {
+			System.out.println("No initial game state available!");
+			msg = "No initial game state available!";
+		}
+		refresh(msg);
+	}
+
+	/**
+	 * Save puzzle state to file
+	 */
+	public void savePuzzle() {
+		lastCommand = currCommand;
+		currCommand = "V";
+		String msg  = "";
+		if (puzzle == null) {
+			System.out.println("No game available to save.");
+			msg = "No game available to save.";
+		} else {
+			DateTimeFormatter dtf   =  DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss");
+			LocalDateTime     now   =  LocalDateTime.now();
+			String filename = "puzzle-" + dtf.format(now);
+			String filepath = workDir + "/snapshot/" + filename;
+			String relFilepath = "./snapshot/" + filename;
+
+			try (PrintStream out = new PrintStream(new FileOutputStream(filepath))) {
+				out.print(puzzle.toString());
+				System.out.println("Puzzle saved in: " + filepath + "\n");
+				msg = "Puzzle saved in: \n" + relFilepath + "\n";
+			} catch (FileNotFoundException e){
+				throw new SokobanException("File not found" + e);
+			}
+		}
+		refresh(msg);
+	}
+
+	/**
+	 * Load saved puzzle from file
+	 */
+	public void loadSavedPuzzle() {
+		lastCommand = currCommand;
+		currCommand = "L";
+		String msg  = "";
+
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		int fileChoice = fileChooser.showOpenDialog(appFrame);
+		if(fileChoice == JFileChooser.APPROVE_OPTION){
+			loadFile  =  fileChooser.getSelectedFile();
+			System.out.println("Loaded saved game from \n" + loadFile.getAbsolutePath() + "\n");
+			System.out.println("Before Load \n" + puzzle.toString() + "\n");
+			msg = "Loaded saved game from " + loadFile.getAbsolutePath() + "\n";
+			genGame();
+			System.out.println("After Load \n" + puzzle.toString() + "\n");
+		} else{
+			System.out.println("Unable to load saved game. Loading new game\n");
+			msg = "Unable to load saved game. Loading new game\n";
+			refresh(msg);
+		}
 
 	}
+
 
 	/**
 	 *
 	 */
 	public static void main(String[] args) {
 		SokobanGUI ui = new SokobanGUI();
-		ui.generateWindow();
+		ui.newGame();
 	}
 
 	/**
@@ -293,31 +405,32 @@ public class SokobanGUI  {
 			System.out.println("trace: " + s);
 	}
 
-	private SokobanTextUI  textUI    = null;
+	private Sokoban puzzle     = null;
+	private Player  player     = null;
+	private File    loadFile   = null;
 
-	private Scanner scnr          = null;
-	private Sokoban puzzle        = null;
-	private Player  player        = null;
-	private String  screenFile    = null;
-	private String  screenPath    = null;
-	private String  lastMove      = null;
+	private JTextPane   outputPane     = null;
+	private JPanel      boardPanel     = null;
+	private JPanel      adminPanel     = null;
+	private JPanel      playPanel      = null;
+	private JFrame      appFrame       = new JFrame("Sokoban GUI");
 
-	private ArrayList <String> fileList        = null;
-	private ArrayList <String> currGameState   = null;
-	private ArrayList <String> prevGameState   = null;
+	private String  outMsg          = "";
+	private String  currCommand     = "";
+	private String  lastCommand     = "";
+	private String  screenFile      = null;
+	private String  screenPath      = null;
 
 	private static Integer imgHeight     = 20;
 	private static Integer imgWidth      = 20;
-	private static Integer frameHeight   = 800;
-	private static Integer frameWidth    = 800;
-	private static Integer leftMargin    = 5;
-	private static Integer numBtnRows    = 30;
-	private static Integer numBtnCols    = 30;
+	private static Integer frameHeight   = 500;
+	private static Integer frameWidth    = 500;
+	private static Integer numGrid       = 30;
 	private static Integer minScreen     = 1;
 	private static Integer maxScreen     = 90;
-	private static boolean traceOn       = false; // for debugging
+	private static boolean traceOn       = true; // for debugging
 	private static String  workDir       = System.getProperty("user.dir");
+	private static Font    appFont       = new Font("Monospaced", Font.BOLD, 15);
 
 	private static HashMap<String,ImageIcon> symbolMap  =  null;
-
 }
