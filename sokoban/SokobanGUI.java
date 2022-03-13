@@ -2,7 +2,6 @@ package sokoban;
 
 import java.io.*;
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.util.*;
@@ -10,12 +9,12 @@ import java.util.concurrent.*;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
-import sokoban.Sokoban;
-import sokoban.SokobanException;
-import sokoban.RandomPlayer;
-import sokoban.Player;
-import sokoban.Direction;
-
+/**
+ * TODO
+ * Include Doc String
+ * Perhaps, do some styling of components
+ * Perform unit testing of components
+ */
 /**
  * A text-based user interface for a Sokoban puzzle.
  *
@@ -24,37 +23,21 @@ import sokoban.Direction;
  * @version March 2022
  */
 public class SokobanGUI  {
-// public class SokobanGUI extends JFrame implements ActionListener {
 	/**
 	 * Default constructor
 	 */
 	public SokobanGUI() {
-		Image brickImg         = new ImageIcon(
-			workDir + "/image/brick-wall.png"
-		).getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
-		Image boxImg           = new ImageIcon(
-			workDir + "/image/icons8-box-16.png"
-		).getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
-		Image humanImg         = new ImageIcon(
-			workDir + "/image/icons8-human-51.png"
-		).getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
-		Image targetImg        = new ImageIcon(
-			workDir + "/image/icons8-target-48.png"
-		).getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
-		Image humanTargetImg   = new ImageIcon(
-			workDir + "/image/icons8-target-64.png"
-		).getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
-		Image bullseyeImg      = new ImageIcon(
-			workDir + "/image/icons8-bullseye-48.png"
-		).getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
-
-		// // - ‘#’ for a wall;
-		// // - ‘$’ for a box;
-		// // - ‘@’ for the actor;
-		// // - ‘.’ for a target;
-		// // - ‘+’ for the actor on a target; and
-		// // - ‘*’ for a box on a target.
-
+		Image brickImg         = new ImageIcon(workDir + "/image/brick-wall.png")
+			.getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
+		Image boxImg           = new ImageIcon(workDir + "/image/icons8-box-16.png")
+			.getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
+		Image humanImg         = new ImageIcon(workDir + "/image/icons8-human-51.png")
+			.getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
+		Image targetImg        = new ImageIcon(workDir + "/image/icons8-target-48.png")
+			.getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
+		Image humanTargetImg   = new ImageIcon(workDir + "/image/icons8-target-64.png")
+			.getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
+		Image bullseyeImg      = new ImageIcon(workDir + "/image/icons8-bullseye-48.png").getImage().getScaledInstance(imgHeight, imgWidth, Image.SCALE_DEFAULT);
 
 		symbolMap = new HashMap<String,ImageIcon>();
 		symbolMap.put("#", new ImageIcon(brickImg));
@@ -68,7 +51,6 @@ public class SokobanGUI  {
 		appFrame.setLayout(new BorderLayout(50, 50));
 		appFrame.setSize(frameHeight, frameWidth);
 	}
-
 
 	/**
 	 * Set up new game
@@ -157,7 +139,6 @@ public class SokobanGUI  {
 			String   row      = null;
 			if ( i < currGameState.size()){
 				row = currGameState.get(i);
-				// System.out.println(row);
 				if (row.length() > 0){
 					countBox = row.length();
 				}
@@ -238,7 +219,7 @@ public class SokobanGUI  {
 	}
 
 	/**
-	 * Refresh frame and include output message
+	 * Refresh frame and clear output message
 	 *
 	 * @param command the user command string
 	 */
@@ -383,7 +364,6 @@ public class SokobanGUI  {
 			msg = "Unable to load saved game. Loading new game\n";
 			refresh(msg);
 		}
-
 	}
 
 

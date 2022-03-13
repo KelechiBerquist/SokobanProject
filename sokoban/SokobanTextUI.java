@@ -6,12 +6,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
-import sokoban.Sokoban;
-import sokoban.SokobanException;
-import sokoban.RandomPlayer;
-import sokoban.Player;
-import sokoban.Direction;
-
 /**
  * A text-based user interface for a Sokoban puzzle.
  *
