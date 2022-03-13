@@ -92,10 +92,11 @@ public class SokobanGUI  {
 		genOutMsgPane();
 		genAdminBtns();
 		genPlayBtns();
+		// genFooterBtns();
 
-		appFrame.getContentPane().add(adminPanel);
 		appFrame.setLayout(new BoxLayout(appFrame.getContentPane(), BoxLayout.PAGE_AXIS));
 		appFrame.getContentPane().add(boardPanel);
+		appFrame.getContentPane().add(adminPanel);
 		appFrame.getContentPane().add(playPanel);
 		appFrame.getContentPane().add(outputPane);
 		appFrame.pack();
@@ -129,6 +130,7 @@ public class SokobanGUI  {
 		ArrayList<String> currGameState = Helpers.listFromString(puzzle.toString());
 		boardPanel = new JPanel();
 		boardPanel.setSize(frameHeight-10, frameWidth-10);
+		boardPanel.setVisible(true);
 		boardPanel.setLayout(new GridLayout(numGrid, numGrid));
 
 		Border paneEdge = BorderFactory.createEmptyBorder(30,200,0,0);
@@ -150,7 +152,7 @@ public class SokobanGUI  {
 
 				if (countBox != 0 && j >= 0 && j < countBox) {
 					String theChar =  Character.toString(row.charAt(j));
-					if (!(puzzle.onTarget() | theChar.equalsIgnoreCase(" "))){
+					if (!(theChar.equalsIgnoreCase(" "))){
 						button.setIcon(symbolMap.get(theChar));
 						button.setMargin(new Insets(0, 0, 0, 0));
 					}
@@ -174,14 +176,25 @@ public class SokobanGUI  {
 		JButton newBtn      = new JButton("New");
 		JButton loadBtn     = new JButton("Load");
 
-		quitBtn.addActionListener(e -> {appFrame.dispose();});
-		saveBtn.addActionListener(e -> {savePuzzle();});
+		quitBtn.addActionListener(e ->    {appFrame.dispose();});
+		saveBtn.addActionListener(e ->    {savePuzzle();});
 		restartBtn.addActionListener(e -> {clearPuzzle();});
-		newBtn.addActionListener(e -> {newGame();});
-		loadBtn.addActionListener(e -> {loadSavedPuzzle();});
+		newBtn.addActionListener(e ->     {newGame();});
+		loadBtn.addActionListener(e ->    {loadSavedPuzzle();});
+
+		JButton[] buttonList = {quitBtn, saveBtn, restartBtn, newBtn, loadBtn};
+
+		for (JButton eachButton: buttonList){
+			eachButton.setPreferredSize(new Dimension(50, 30));
+			eachButton.setOpaque(false);
+			eachButton.setContentAreaFilled(false);
+			eachButton.setBorderPainted(false);
+			eachButton.setBorder(null);
+			eachButton.setFont(appFont);
+		}
 
 		adminPanel  =  new JPanel();
-		adminPanel.setLayout(new FlowLayout());
+		adminPanel.setLayout(new GridLayout(1, 4));
 		adminPanel.add(quitBtn);
 		adminPanel.add(saveBtn);
 		adminPanel.add(restartBtn);
@@ -189,16 +202,22 @@ public class SokobanGUI  {
 		adminPanel.add(loadBtn);
 	}
 
+
 	/**
 	 *
 	 */
 	public void genPlayBtns() {
-		JButton nMoveBtn   = new JButton("Move North");
-		JButton eMoveBtn   = new JButton("Move East");
-		JButton wMoveBtn   = new JButton("Move West");
-		JButton sMoveBtn   = new JButton("Move South");
-		JButton uMoveBtn   = new JButton("Undo Move");
-		JButton rMoveBtn   = new JButton("Random Move");
+		JButton nMoveBtn     =  new JButton("N");
+		JButton eMoveBtn     =  new JButton("E");
+		JButton wMoveBtn     =  new JButton("W");
+		JButton sMoveBtn     =  new JButton("S");
+		JButton rMoveBtn     =  new JButton("P");
+		JButton uMoveBtn     =  new JButton("Undo");
+		JButton hMoveBtn     =  new JButton("Help");
+		JButton invisible1   =  new JButton("");
+		JButton invisible2   =  new JButton("");
+		JButton invisible3   =  new JButton("");
+		JButton invisible4   =  new JButton("");
 
 		nMoveBtn.addActionListener(e -> {move(Direction.NORTH);});
 		wMoveBtn.addActionListener(e -> {move(Direction.WEST);});
@@ -207,15 +226,164 @@ public class SokobanGUI  {
 		uMoveBtn.addActionListener(e -> {undoMove();});
 		rMoveBtn.addActionListener(e -> {playerMove();});
 
-		playPanel  =  new JPanel();
-		playPanel.setLayout(new FlowLayout());
-		playPanel.add(nMoveBtn);
-		playPanel.add(wMoveBtn);
-		playPanel.add(eMoveBtn);
-		playPanel.add(sMoveBtn);
-		playPanel.add(uMoveBtn);
-		playPanel.add(rMoveBtn);
+		JButton[] buttonList = {
+			nMoveBtn, eMoveBtn, wMoveBtn, sMoveBtn, uMoveBtn,
+			rMoveBtn, hMoveBtn, invisible1, invisible2, invisible3,
+			invisible4
+		};
 
+		for (JButton eachButton: buttonList){
+			if (
+				eachButton.getText().equals("Help") ||
+				eachButton.getText().equals("Undo")
+			){
+				eachButton.setPreferredSize(new Dimension(100, 30));
+			} else {
+				eachButton.setPreferredSize(new Dimension(50, 30));
+			}
+
+			eachButton.setOpaque(false);
+			eachButton.setContentAreaFilled(false);
+			eachButton.setBorderPainted(false);
+			eachButton.setBorder(null);
+			eachButton.setFont(appFont);
+		}
+
+
+		JPanel nPanel = new JPanel(new FlowLayout());
+		JPanel sPanel = new JPanel(new FlowLayout());
+		nPanel.add(invisible1);
+		nPanel.add(nMoveBtn);
+		nPanel.add(invisible2);
+		sPanel.add(invisible3);
+		sPanel.add(sMoveBtn);
+		sPanel.add(invisible4);
+
+
+		JPanel movePanel = new JPanel();
+		movePanel.setLayout(new BorderLayout(10,10));
+		movePanel.add(nPanel,   BorderLayout.NORTH);
+		movePanel.add(sPanel,   BorderLayout.SOUTH);
+		movePanel.add(eMoveBtn, BorderLayout.EAST);
+		movePanel.add(wMoveBtn, BorderLayout.WEST);
+		movePanel.add(rMoveBtn, BorderLayout.CENTER);
+
+		Border paneEdge = BorderFactory.createEmptyBorder(30,30,30,30);
+		movePanel.setBorder(paneEdge);
+
+
+		playPanel  =  new JPanel();
+		playPanel.add(movePanel);
+		playPanel.add(uMoveBtn);
+		playPanel.add(hMoveBtn);
+	}
+
+
+	/**
+	 *
+	 */
+	public void genFooterBtns() {
+		JButton nMoveBtn    =  new JButton("N");
+		JButton eMoveBtn    =  new JButton("E");
+		JButton wMoveBtn    =  new JButton("W");
+		JButton sMoveBtn    =  new JButton("S");
+		JButton rMoveBtn    =  new JButton("P");
+		JButton uMoveBtn    =  new JButton("Undo");
+		JButton hMoveBtn    =  new JButton("Help");
+		JButton invisible1  =  new JButton("");
+		JButton invisible2  =  new JButton("");
+		JButton invisible3  =  new JButton("");
+		JButton invisible4  =  new JButton("");
+		JButton quitBtn     =  new JButton("Quit");
+		JButton saveBtn     =  new JButton("Save");
+		JButton restartBtn  =  new JButton("Restart");
+		JButton newBtn      =  new JButton("New");
+		JButton loadBtn     =  new JButton("Load");
+
+
+		nMoveBtn.addActionListener(e -> {move(Direction.NORTH);});
+		wMoveBtn.addActionListener(e -> {move(Direction.WEST);});
+		eMoveBtn.addActionListener(e -> {move(Direction.EAST);});
+		sMoveBtn.addActionListener(e -> {move(Direction.SOUTH);});
+		uMoveBtn.addActionListener(e -> {undoMove();});
+		rMoveBtn.addActionListener(e -> {playerMove();});
+		quitBtn.addActionListener(e -> {appFrame.dispose();});
+		saveBtn.addActionListener(e -> {savePuzzle();});
+		restartBtn.addActionListener(e -> {clearPuzzle();});
+		newBtn.addActionListener(e -> {newGame();});
+		loadBtn.addActionListener(e -> {loadSavedPuzzle();});
+
+
+		JButton[] buttonList = {
+			nMoveBtn, eMoveBtn, wMoveBtn, sMoveBtn, uMoveBtn,
+			rMoveBtn, hMoveBtn, quitBtn, saveBtn, restartBtn,
+			newBtn, loadBtn, invisible1, invisible2,
+			invisible3, invisible4
+		};
+
+		for (JButton eachButton: buttonList){
+			if (
+				eachButton.getText().equals("Help") ||
+				eachButton.getText().equals("Undo")
+			){
+				eachButton.setPreferredSize(new Dimension(100, 30));
+			} else {
+				eachButton.setPreferredSize(new Dimension(50, 30));
+			}
+
+			eachButton.setOpaque(false);
+			eachButton.setContentAreaFilled(false);
+			eachButton.setBorderPainted(false);
+			eachButton.setBorder(null);
+			eachButton.setFont(appFont);
+		}
+
+		/**
+		 * Define panel for styling player moves
+		 */
+		JPanel nPanel = new JPanel(new FlowLayout());
+		JPanel sPanel = new JPanel(new FlowLayout());
+		nPanel.add(invisible1);
+		nPanel.add(nMoveBtn);
+		nPanel.add(invisible2);
+		sPanel.add(invisible3);
+		sPanel.add(sMoveBtn);
+		sPanel.add(invisible4);
+
+		JPanel movePanel = new JPanel();
+		movePanel.setLayout(new BorderLayout(10,10));
+		movePanel.add(nPanel,   BorderLayout.NORTH);
+		movePanel.add(sPanel,   BorderLayout.SOUTH);
+		movePanel.add(eMoveBtn, BorderLayout.EAST);
+		movePanel.add(wMoveBtn, BorderLayout.WEST);
+		movePanel.add(rMoveBtn, BorderLayout.CENTER);
+		Border paneEdge = BorderFactory.createEmptyBorder(30,30,30,30);
+		movePanel.setBorder(paneEdge);
+
+
+		/**
+		 * Define panel to style admin instructions
+		 */
+		JPanel otherPanel = new JPanel(new GridLayout(3, 2));
+		otherPanel.add(uMoveBtn);
+		otherPanel.add(hMoveBtn);
+		otherPanel.add(quitBtn);
+		otherPanel.add(saveBtn);
+		otherPanel.add(restartBtn);
+		otherPanel.add(newBtn);
+		otherPanel.add(loadBtn);
+
+
+
+		playPanel  =  new JPanel(new FlowLayout());
+		playPanel.add(movePanel);
+		playPanel.add(otherPanel);
+		// playPanel.add(hMoveBtn);
+		// playPanel.add(quitBtn);
+		// playPanel.add(saveBtn);
+		// playPanel.add(restartBtn);
+		// playPanel.add(newBtn);
+		// playPanel.add(loadBtn);
 	}
 
 	/**
@@ -366,7 +534,6 @@ public class SokobanGUI  {
 		}
 	}
 
-
 	/**
 	 *
 	 */
@@ -393,7 +560,7 @@ public class SokobanGUI  {
 	private JPanel      boardPanel     = null;
 	private JPanel      adminPanel     = null;
 	private JPanel      playPanel      = null;
-	private JFrame      appFrame       = new JFrame("Sokoban GUI");
+	private JFrame      appFrame       = new JFrame("Sokoban Game");
 
 	private String  outMsg          = "";
 	private String  currCommand     = "";
@@ -403,14 +570,14 @@ public class SokobanGUI  {
 
 	private static Integer imgHeight     = 20;
 	private static Integer imgWidth      = 20;
-	private static Integer frameHeight   = 500;
-	private static Integer frameWidth    = 500;
+	private static Integer frameHeight   = 800;
+	private static Integer frameWidth    = 800;
 	private static Integer numGrid       = 30;
 	private static Integer minScreen     = 1;
 	private static Integer maxScreen     = 90;
 	private static boolean traceOn       = true; // for debugging
 	private static String  workDir       = System.getProperty("user.dir");
-	private static Font    appFont       = new Font("Monospaced", Font.BOLD, 15);
+	private static Font    appFont       = new Font("Monospaced", Font.BOLD, 20);
 
 	private static HashMap<String,ImageIcon> symbolMap  =  null;
 }
