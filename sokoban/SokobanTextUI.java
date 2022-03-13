@@ -124,15 +124,32 @@ public class SokobanTextUI {
 		if (command.equalsIgnoreCase("Q")) {
 			quitPuzzle();
 		} else if (command.equalsIgnoreCase("N")) {
-			north();
+			/**
+			 * Move the actor north
+			*/
+			move(Direction.NORTH);
 		} else if (command.equalsIgnoreCase("S")) {
-			south();
+			/**
+			 * Move the actor south
+			 */
+			move(Direction.SOUTH);
 		} else if (command.equalsIgnoreCase("E")) {
-			east();
+			/**
+			 * Move the actor east
+			 */
+			move(Direction.EAST);
 		} else if (command.equalsIgnoreCase("W")) {
-			west();
+			/**
+			 * Move the actor west
+			 */
+			move(Direction.WEST);
 		} else if (command.equalsIgnoreCase("P")) {
-			playerMove();
+			/**
+			 * Move the actor according to the computer player's choice
+			 */
+			Vector<Direction> choices = puzzle.canMove();
+			Direction         choice  = player.move(choices);
+			move(choice);
 		} else if (command.equalsIgnoreCase("U")) {
 			undoMove();
 		} else if (command.equalsIgnoreCase("R")) {
@@ -146,43 +163,6 @@ public class SokobanTextUI {
 		} else {
 			System.out.println("Unknown command (" + command + ")");
 		}
-	}
-
-	/**
-	 * Move the actor north
-	 */
-	private void north() {
-		move(Direction.NORTH);
-	}
-
-	/**
-	 * Move the actor south
-	 */
-	private void south() {
-		move(Direction.SOUTH);
-	}
-
-	/**
-	 * Move the actor east
-	 */
-	private void east() {
-		move(Direction.EAST);
-	}
-
-	/**
-	 * Move the actor west
-	 */
-	private void west() {
-		move(Direction.WEST);
-	}
-
-	/**
-	 * Move the actor according to the computer player's choice
-	 */
-	private void playerMove() {
-		Vector<Direction> choices = puzzle.canMove();
-		Direction         choice  = player.move(choices);
-		move(choice);
 	}
 
 	/**

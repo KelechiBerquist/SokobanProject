@@ -50,13 +50,11 @@ public class Sokoban extends Observable implements Cloneable {
 			}
 		}
 		cells    = new Cell[numRows][numCols];
-		displays = new String[numRows][numCols];
 		for (int row=0; row<numRows; row++) {
 			String line = lines.get(row);
 			for (int col=0; col<numCols; col++) {
 				char display = (col < line.length()) ? line.charAt(col) : Sokoban.EMPTY;
 				cells[row][col] = new Cell(display, this, row, col);
-				displays[row][col] = Character.toString(display);
 				if (display == ACTOR || display == TARGET_ACTOR)
 					actorCell = cells[row][col];
 			}
@@ -268,7 +266,6 @@ public class Sokoban extends Observable implements Cloneable {
 			setChanged();
 			notifyObservers(next); // to where box may have been pushed
 		}
-		setDisplay();
 	}
 
 	/**
@@ -285,26 +282,6 @@ public class Sokoban extends Observable implements Cloneable {
 			b.append("\n");
 		}
 		return b.toString();
-	}
-
-	/**
-	 * Sets a list of char representation of sokoban puzzle
-	 */
-	public void setDisplay() {
-		for (int row=0; row<numRows; row++) {
-			for (int col=0; col<numCols; col++){
-				displays[row][col] = Character.toString(cells[row][col].getDisplay());
-			}
-		}
-	}
-
-	/**
-	 * Returns a list of char representation of sokoban puzzle
-	 *
-	 * @return the String[][] representation
-	 */
-	public String[][] getDisplay() {
-		return displays;
 	}
 
 	/**
@@ -375,10 +352,9 @@ public class Sokoban extends Observable implements Cloneable {
 	private int      numRows     = 0;
 	private int      numCols     = 0;
 	private Cell     actorCell   = null;
-	private Cell[][]    cells       = null;
-	private String[][]  displays    = null;
 	private String   startScreen = null;
-	private String   prevScreen = null;
+	private String   prevScreen  = null;
+	private Cell[][]    cells      = null;
 
 	private static boolean traceOn = false; // for debugging
 }
