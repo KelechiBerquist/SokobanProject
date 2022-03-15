@@ -1,2 +1,5 @@
 sokoban/*.class
 sokoban/*/*.class
+test/*.class
+test/*/*.class
+snapshot/puzzle-*

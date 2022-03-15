@@ -1,7 +1,7 @@
 package sokoban;
 
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Helpers {
 	Helpers(){
@@ -20,4 +20,21 @@ public class Helpers {
 		return lines;
 	}
 
+	public static String fileAsString(File file){
+		if (file == null)
+		throw new IllegalArgumentException("file cannot be null");
+		Scanner      fscnr = null;
+		StringBuffer sb    = new StringBuffer();
+		try {
+			fscnr = new Scanner(file);
+			while (fscnr.hasNextLine())
+				sb.append(fscnr.nextLine()+"\n");
+		} catch(IOException e) {
+			throw new SokobanException(""+e);
+		} finally {
+			if (fscnr != null)
+				fscnr.close();
+		}
+		return sb.toString();
+	}
 }

@@ -302,21 +302,7 @@ public class Sokoban extends Observable implements Cloneable {
 	 * @return the file as a string
 	 */
 	public static String fileAsString(File file) {
-		if (file == null)
-			throw new IllegalArgumentException("file cannot be null");
-		Scanner      fscnr = null;
-		StringBuffer sb    = new StringBuffer();
-		try {
-			fscnr = new Scanner(file);
-			while (fscnr.hasNextLine())
-				sb.append(fscnr.nextLine()+"\n");
-		} catch(IOException e) {
-			throw new SokobanException(""+e);
-		} finally {
-			if (fscnr != null)
-				fscnr.close();
-		}
-		return sb.toString();
+		return Helpers.fileAsString(file);
 	}
 
 	/**
