@@ -476,8 +476,8 @@ public class GUI  {
 		currCommand      =   Character.toString(dirString.charAt(0));
 
 		if (!puzzle.canMove(dir)) {
-			System.out.println(dir.toString() + " is an invalid move.");
-			msg = dir.toString() + " is an invalid move.";
+			System.out.println(dirString + " is an invalid move.");
+			msg = dirString + " is an invalid move.";
 		} else {
 			msg = "Moving " + dirString;
 			System.out.println("Moving " + dirString);
