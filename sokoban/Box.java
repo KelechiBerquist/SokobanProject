@@ -1,4 +1,4 @@
-package sokoban;
+ 
 
 /**
  * A box in a Sokoban puzzle.

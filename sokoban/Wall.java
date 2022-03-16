@@ -1,4 +1,4 @@
-package sokoban;
+ 
 
 /**
  * A wall in a Sokoban puzzle.

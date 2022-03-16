@@ -1,4 +1,4 @@
-package sokoban;
+ 
 
 /**
  * An abstract cell occupant in a Sokoban puzzle.

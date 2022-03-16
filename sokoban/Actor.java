@@ -1,4 +1,4 @@
-package sokoban;
+ 
 
 /**
  * An actor in a Sokoban puzzle.

@@ -1,4 +1,4 @@
-package sokoban;
+ 
 
 /**
  * A problem-specific run time exception for a Sokoban puzzle.

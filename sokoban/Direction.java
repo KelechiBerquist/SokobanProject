@@ -1,4 +1,4 @@
-package sokoban;
+ 
 
 /**
  * Compass directions in a Sokoban puzzle.
