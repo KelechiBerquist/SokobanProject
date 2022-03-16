@@ -1,5 +1,4 @@
-sokoban/*.class
-sokoban/*/*.class
-test/*.class
-test/*/*.class
+*/*.ctxt
+*/*.class
+*/*/*.class
 snapshot/puzzle-*
