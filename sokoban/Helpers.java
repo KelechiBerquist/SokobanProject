@@ -1,7 +1,7 @@
 package sokoban;
-
 import java.io.*;
 import java.util.*;
+
 
 public class Helpers {
 	Helpers(){
@@ -19,7 +19,6 @@ public class Helpers {
 		scnr.close();
 		return lines;
 	}
-
 	public static String fileAsString(File file){
 		if (file == null)
 		throw new IllegalArgumentException("file cannot be null");
@@ -37,4 +36,5 @@ public class Helpers {
 		}
 		return sb.toString();
 	}
+
 }

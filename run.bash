@@ -10,6 +10,7 @@ cd $WORKDIR
 rm  ./sokoban/*.class
 rm  ./test/*.class
 
+
 # echo
 # echo
 # echo
