@@ -556,8 +556,8 @@ public class GUI  {
 
 			try (PrintStream out = new PrintStream(new FileOutputStream(filepath))) {
 				out.print(puzzle.toString());
-				System.out.println("Puzzle saved in: " + filepath + "\n");
-				msg = "Puzzle saved in: \n" + relFilepath + "\n";
+				System.out.println("Puzzle saved in: " + filepath);
+				msg = "Puzzle saved in: \n" + relFilepath;
 			} catch (FileNotFoundException e){
 				throw new SokobanException("File not found" + e);
 			}
