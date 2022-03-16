@@ -318,9 +318,9 @@ public class TextUI {
 	 */
 	private void quitPuzzle() {
 		System.out.println(String.join(
-			"Would you like to save the game before quitting?\n"
-			"Options:\n"
-			"	Yes      [Y]\n"
+			"Would you like to save the game before quitting?\n",
+			"Options:\n",
+			"	Yes      [Y]\n",
 			"	No       [N]\n"
 		));
 		String response = getCommand();
