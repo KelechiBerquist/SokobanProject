@@ -145,7 +145,7 @@ public class TextUI {
 	 */
 	private void move(Direction dir) {
 		if (!puzzle.canMove(dir)) {
-			System.out.println("invalid move");
+			System.out.println(dir.toString() + " is and invalid move");
 			return;
 		}
 		puzzle.move(dir);
@@ -203,12 +203,12 @@ public class TextUI {
 		) {
 			try {
 				puzzle.undo();
-				System.out.println("Move undone.");
+				System.out.println(lastCommand + " undone.");
 			} catch (IllegalStateException ex) {
 				System.out.println("No previous moves available!");
 			}
 		} else {
-			System.out.println("This move cannot be undone.");
+			System.out.println(lastCommand + " cannot be undone.");
 		}
 	}
 

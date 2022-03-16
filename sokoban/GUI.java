@@ -476,8 +476,8 @@ public class GUI  {
 		currCommand      =   Character.toString(dirString.charAt(0));
 
 		if (!puzzle.canMove(dir)) {
-			System.out.println("Invalid move.");
-			msg = "Invalid move.";
+			System.out.println(dir.toString() + " is an invalid move.");
+			msg = dir.toString() + " is an invalid move.";
 		} else {
 			msg = "Moving " + dirString;
 			System.out.println("Moving " + dirString);
@@ -506,15 +506,15 @@ public class GUI  {
 		) {
 			try {
 				puzzle.undo();
-				System.out.println("Move undone.");
-				msg = "Move undone.";
+				System.out.println(lastCommand + " undone.");
+				msg = lastCommand + " undone.";
 			} catch (IllegalStateException ex) {
 				System.out.println("No previous moves available!");
 				msg = "No previous moves available!";
 			}
 		} else {
-			System.out.println("This move cannot be undone.");
-			msg = "This move cannot be undone.";
+			System.out.println(lastCommand + " cannot be undone.");
+			msg = lastCommand + " cannot be undone.";
 		}
 		refresh(msg);
 	}
