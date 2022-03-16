@@ -59,18 +59,18 @@ public class TextUI {
 	 */
 	private void displayMenu()  {
 		System.out.println(String.join(
-			"Enter command using the keyboard.\n"
-			"Possible commands:\n"
-			"		Move North               [N]\n"
-			"		Move South               [S]\n"
-			"		Move East                [E]\n"
-			"		Move West                [W]\n"
-			"		Player Move              [P]\n"
-			"		Undo Move                [U]\n"
-			"		New Game                 [A]\n"
-			"		Restart Game             [R]\n"
-			"		Save Game                [V]\n"
-			"		Load Saved Game          [L]\n"
+			"Enter command using the keyboard.\n",
+			"Possible commands:\n",
+			"		Move North               [N]\n",
+			"		Move South               [S]\n",
+			"		Move East                [E]\n",
+			"		Move West                [W]\n",
+			"		Player Move              [P]\n",
+			"		Undo Move                [U]\n",
+			"		New Game                 [A]\n",
+			"		Restart Game             [R]\n",
+			"		Save Game                [V]\n",
+			"		Load Saved Game          [L]\n",
 			"		Quit Game                [Q]\n"
 		));
 	}

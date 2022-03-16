@@ -604,19 +604,19 @@ public class GUI  {
 	 */
 	public void showHelp() {
 		String helpText = String.join(
-		"Read up on how to play the game: https://en.wikipedia.org/wiki/Sokoban \n\n"
-		"Here are the options within this application:\n\n"
-			"[Quit]         Quit the current game\n"
-			"[New]          Start a new game\n"
-			"[Load]         Load from a previously saved game\n"
-			"[Save]         Save the current game\n"
-			"[Restart]      Restart this game from the beginning\n"
-			"[Undo]         Undo the previous player move\n"
-			"[Help]         Opens this help panel\n"
-			"[N]            Move actor north\n"
-			"[P]            Make computer move\n"
-			"[W]            Move actor west\n"
-			"[E]            Move actor east\n"
+		"Read up on how to play the game: https://en.wikipedia.org/wiki/Sokoban \n\n",
+		"Here are the options within this application:\n\n",
+			"[Quit]         Quit the current game\n",
+			"[New]          Start a new game\n",
+			"[Load]         Load from a previously saved game\n",
+			"[Save]         Save the current game\n",
+			"[Restart]      Restart this game from the beginning\n",
+			"[Undo]         Undo the previous player move\n",
+			"[Help]         Opens this help panel\n",
+			"[N]            Move actor north\n",
+			"[P]            Make computer move\n",
+			"[W]            Move actor west\n",
+			"[E]            Move actor east\n",
 			"[S]            Move actor south\n"
 		);
 		JTextPane helpPane = new JTextPane();
