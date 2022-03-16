@@ -4,9 +4,11 @@ import java.util.*;
 
 
 public class Helpers {
-	Helpers(){
+	Helpers(){}
 
-	}
+	/** 
+	 * Get a list of Strings from a multiline String.
+	 */
 	public static ArrayList<String> listFromString(String str){
 		Scanner           scnr = null;
 		ArrayList<String> lines = new ArrayList<>();
@@ -19,6 +21,10 @@ public class Helpers {
 		scnr.close();
 		return lines;
 	}
+
+	/** 
+	 * Convert file to string
+	 */
 	public static String fileAsString(File file){
 		if (file == null)
 		throw new IllegalArgumentException("file cannot be null");

@@ -58,21 +58,21 @@ public class TextUI {
 	 * Display the user menu
 	 */
 	private void displayMenu()  {
-		System.out.println("""
-			Enter command using the keyboard.
-			Possible commands:
-					Move North               [N]
-					Move South               [S]
-					Move East                [E]
-					Move West                [W]
-					Player Move              [P]
-					Undo Move                [U]
-					New Game                 [A]
-					Restart Game             [R]
-					Save Game                [V]
-					Load Saved Game          [L]
-					Quit Game                [Q]
-		""");
+		System.out.println(String.join(
+			"Enter command using the keyboard.\n"
+			"Possible commands:\n"
+			"		Move North               [N]\n"
+			"		Move South               [S]\n"
+			"		Move East                [E]\n"
+			"		Move West                [W]\n"
+			"		Player Move              [P]\n"
+			"		Undo Move                [U]\n"
+			"		New Game                 [A]\n"
+			"		Restart Game             [R]\n"
+			"		Save Game                [V]\n"
+			"		Load Saved Game          [L]\n"
+			"		Quit Game                [Q]\n"
+		));
 	}
 
 	/**
@@ -317,12 +317,12 @@ public class TextUI {
 	 * Give player the option of saving the game before quitting
 	 */
 	private void quitPuzzle() {
-		System.out.println("""
-			Would you like to save the game before quitting?
-			Options:
-				Yes      [Y]
-				No       [N]
-		""");
+		System.out.println(String.join(
+			"Would you like to save the game before quitting?\n"
+			"Options:\n"
+			"	Yes      [Y]\n"
+			"	No       [N]\n"
+		));
 		String response = getCommand();
 		if (response.equalsIgnoreCase("Y")){
 			savePuzzle();

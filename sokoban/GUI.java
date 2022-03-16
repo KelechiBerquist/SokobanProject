@@ -62,7 +62,7 @@ public class GUI  {
 	}
 
 	/**
-	 *
+	 * Initialise game attributes
 	 */
 	public void initGameAttr() {
 		Integer randomNum   =   ThreadLocalRandom.current().nextInt(minScreen, maxScreen + 1);
@@ -72,7 +72,7 @@ public class GUI  {
 	}
 
 	/**
-	 *
+	 * Generate a new game from current game attribute
 	 */
 	public void genGame() {
 		puzzle = new Sokoban(loadFile);
@@ -81,7 +81,7 @@ public class GUI  {
 	}
 
 	/**
-	 *
+	 * Generate the GUI frame
 	 */
 	public void genFrame() {
 		appFrame.getContentPane().removeAll();
@@ -92,7 +92,6 @@ public class GUI  {
 		genOutMsgPane();
 		genAdminBtns();
 		genPlayBtns();
-		// genFooterBtns();
 
 		appFrame.setLayout(new BoxLayout(appFrame.getContentPane(), BoxLayout.PAGE_AXIS));
 		appFrame.getContentPane().add(boardPanel);
@@ -104,7 +103,7 @@ public class GUI  {
 	}
 
 	/**
-	 *
+	 * Generate a frame for output message
 	 */
 	public void genOutMsgPane() {
 		outputPane = new JTextPane();
@@ -124,7 +123,7 @@ public class GUI  {
 	}
 
 	/**
-	 *
+	 * Generate a frame for the Sokoban game board
 	 */
 	public void genBoard() {
 		ArrayList<String> currGameState = Helpers.listFromString(puzzle.toString());
@@ -168,7 +167,7 @@ public class GUI  {
 	}
 
 	/**
-	 *
+	 * Generate the admin buttons to save, load and quit game
 	 */
 	public void genAdminBtns() {
 		JButton quitBtn     = new JButton("Quit");
@@ -202,7 +201,7 @@ public class GUI  {
 	}
 
 	/**
-	 *
+	 * Generate expanded admin buttons
 	 */
 	public void genFullAdminBtns() {
 		JButton quitBtn     = new JButton("Quit");
@@ -245,7 +244,7 @@ public class GUI  {
 
 
 	/**
-	 *
+	 * Generate the move north, south, east and west buttons
 	 */
 	public void genPlayBtns() {
 		JButton nMoveBtn     =  new JButton("N");
@@ -343,7 +342,7 @@ public class GUI  {
 
 
 	/**
-	 *
+	 * Generate combined admin and user play buttons
 	 */
 	public void genFooterBtns() {
 		JButton nMoveBtn    =  new JButton("N");
@@ -441,12 +440,6 @@ public class GUI  {
 		playPanel  =  new JPanel(new FlowLayout());
 		playPanel.add(movePanel);
 		playPanel.add(otherPanel);
-		// playPanel.add(hMoveBtn);
-		// playPanel.add(quitBtn);
-		// playPanel.add(saveBtn);
-		// playPanel.add(restartBtn);
-		// playPanel.add(newBtn);
-		// playPanel.add(loadBtn);
 	}
 
 	/**
@@ -599,7 +592,7 @@ public class GUI  {
 
 
 	/**
-	 * Get puzzle state
+	 * Get puzzle state as string
 	 */
 	public String getPuzzleState() {
 		return puzzle.toString();
@@ -607,28 +600,25 @@ public class GUI  {
 
 
 	/**
-	 * Load saved puzzle from file
+	 * Show game help
 	 */
 	public void showHelp() {
-		String helpText = """
-		Read up on how to play the game
-		\"https://en.wikipedia.org/wiki/Sokoban\"
-
-		Here are the options within this application:
-
-			[Quit]         Quit the current game
-			[New]          Start a new game
-			[Load]         Load from a previously saved game
-			[Save]         Save the current game
-			[Restart]      Restart this game from the beginning
-			[Undo]         Undo the previous player move
-			[Help]         Opens this help panel
-			[N]            Move actor north
-			[P]            Make computer move
-			[W]            Move actor west
-			[E]            Move actor east
-			[S]            Move actor south
-		""";
+		String helpText = String.join(
+		"Read up on how to play the game: https://en.wikipedia.org/wiki/Sokoban \n\n"
+		"Here are the options within this application:\n\n"
+			"[Quit]         Quit the current game\n"
+			"[New]          Start a new game\n"
+			"[Load]         Load from a previously saved game\n"
+			"[Save]         Save the current game\n"
+			"[Restart]      Restart this game from the beginning\n"
+			"[Undo]         Undo the previous player move\n"
+			"[Help]         Opens this help panel\n"
+			"[N]            Move actor north\n"
+			"[P]            Make computer move\n"
+			"[W]            Move actor west\n"
+			"[E]            Move actor east\n"
+			"[S]            Move actor south\n"
+		);
 		JTextPane helpPane = new JTextPane();
 		JScrollPane scrollPane = new JScrollPane(helpPane);
 		helpPane.setEditable(false);
@@ -636,7 +626,6 @@ public class GUI  {
 		helpPane.setBackground(new Color(224, 255, 255));
 		helpPane.setForeground(new Color(43, 27, 23, 255));
 		helpPane.setFont(appFont);
-		// helpPane.setContentType("text/html");
 		helpPane.setText(helpText);
 
 
@@ -644,7 +633,7 @@ public class GUI  {
 	}
 
 	/**
-	 * Give player the option of saving the game before quitting
+	 * Quit game
 	 */
 	public void quitPuzzle() {
 		System.out.println("Program shutting down.");
@@ -656,7 +645,7 @@ public class GUI  {
 	}
 
 	/**
-	 *
+	 * Main entry point into app
 	 */
 	public static void main(String[] args) {
 		GUI ui = new GUI();
