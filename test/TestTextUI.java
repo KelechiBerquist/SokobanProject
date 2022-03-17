@@ -9,17 +9,17 @@ import static org.mockito.Mockito.*;
 // import static org.mockito.plugins.*;
 
 
-import sokoban.TextUI;
+import sokoban.TUI;
 import sokoban.Helpers;
 
 public class TestTextUI {
-	private TextUI testInstance;
+	private TUI testInstance;
 	private String rootDir;
 	private String testScreenPath;
 
 	@Before
 	public void setUp(){
-		testInstance     =   new TextUI();
+		testInstance     =   new TUI();
 		rootDir          =   System.getProperty("user.dir");
 		testScreenPath   =   rootDir + "/snapshot/test_screen";
 	}
@@ -81,7 +81,7 @@ public class TestTextUI {
 		File savedFile = new File(savedPath);
 		assertTrue(savedFile.exists());
 
-		TextUI savedGame = new TextUI(savedPath);
+		TUI savedGame = new TUI(savedPath);
 		String savedState = savedGame.getPuzzleState();
 		assertTrue(savedState.equals(afterMove));
 		assertFalse(savedState.equals(initialState));
@@ -93,7 +93,7 @@ public class TestTextUI {
 	 */
 	@Test
 	public void testLoadSavedPuzzle(){
-		TextUI mockInstance = spy(new TextUI());
+		TUI mockInstance = spy(new TUI());
 		when(mockInstance.chooseSavedPuzzle()).thenReturn("test_screen");
 
 		InputStream sysInBackup = System.in; // backup System.in to restore it later

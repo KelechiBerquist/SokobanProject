@@ -1,12 +1,11 @@
 package sokoban;
 
- 
-
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
+import static java.util.Map.entry;
 
 /**
  * A text-based user interface for a Sokoban puzzle.
@@ -15,24 +14,42 @@ import java.time.LocalDateTime;
  * @author Dr Kelechi Berquist
  * @version March 2022
  */
-public class TextUI {
+public class TUI {
 	/**
 	 * Default constructor
 	 */
-	public TextUI() {
-		scnr = new Scanner(System.in);
+	public TUI() {
 		getScreenFile();
-		genGame();
+		commonInitSteps();
 	}
 
 	/**
 	 * Constructor given path to file
 	 * @param filename name of file with initialisation screen
 	 */
-	public TextUI(String filename) {
-		scnr = new Scanner(System.in);
-		// System.out.println(filename.split(workDir));
+	public TUI(String filename) {
 		screenPath = filename;
+		commonInitSteps();
+	}
+
+	/**
+	 * Define commands for initialising class
+	 */
+	public void commonInitSteps() {
+		commandMap = Map.ofEntries(
+			entry("N", "North"),
+			entry("W", "West"),
+			entry("E", "East"),
+			entry("S", "South"),
+			entry("P", "Player Move"),
+			entry("U", "Undo"),
+			entry("A", "New Game"),
+			entry("R", "Restart"),
+			entry("V", "Save"),
+			entry("L", "Load Saved Game"),
+			entry("Q", "Quit Game")
+		);
+		scnr = new Scanner(System.in);
 		genGame();
 	}
 
@@ -61,19 +78,20 @@ public class TextUI {
 	 */
 	private void displayMenu()  {
 		System.out.println(String.join(
-			"Enter command using the keyboard.\n",
-			"Possible commands:\n",
-			"		Move North               [N]\n",
-			"		Move South               [S]\n",
-			"		Move East                [E]\n",
-			"		Move West                [W]\n",
-			"		Player Move              [P]\n",
-			"		Undo Move                [U]\n",
-			"		New Game                 [A]\n",
-			"		Restart Game             [R]\n",
-			"		Save Game                [V]\n",
-			"		Load Saved Game          [L]\n",
-			"		Quit Game                [Q]\n"
+			"\n",
+			"Enter command using the keyboard.",
+			"Possible commands:",
+			"     Move North            [N]",
+			"     Move South            [S]",
+			"     Move East             [E]",
+			"     Move West             [W]",
+			"     Player Move           [P]",
+			"     Undo Move             [U]",
+			"     New Game              [A]",
+			"     Restart Game          [R]",
+			"     Save Game             [V]",
+			"     Load Saved Game       [L]",
+			"     Quit Game             [Q]"
 		));
 	}
 
@@ -123,6 +141,7 @@ public class TextUI {
 			 */
 			Vector<Direction> choices = puzzle.canMove();
 			Direction         choice  = player.move(choices);
+			validity.add(true);
 			move(choice);
 		} else if (command.equalsIgnoreCase("U")) {
 			undoMove();
@@ -146,13 +165,18 @@ public class TextUI {
 	 * @param dir the direction to move
 	 */
 	private void move(Direction dir) {
+		String dirString =   dir.toString();
 		if (!puzzle.canMove(dir)) {
-			System.out.println(dir.toString() + " is and invalid move");
+			System.out.println(dirString + " is an invalid move.");
+			validity.add(false);
 			return;
+		} else {
+			System.out.println("Moving " + dirString);
+			puzzle.move(dir);
+			validity.add(true);
 		}
-		puzzle.move(dir);
 		if (puzzle.onTarget()){
-			System.out.println("game won!");
+			System.out.println("Game Won!");
 		}
 	}
 
@@ -179,6 +203,7 @@ public class TextUI {
 		puzzle = new Sokoban(new File(screenPath));
 		player = new RandomPlayer();
 		commands = new ArrayList<String>();
+		validity = new ArrayList<Boolean>();
 	}
 
 
@@ -195,22 +220,29 @@ public class TextUI {
 	 * Undo last player move if move is E, W, N, S, P
 	 */
 	public void undoMove() {
-		String lastCommand = commands.get(commands.size()-2);
-		if (
-			lastCommand.equalsIgnoreCase("N") ||
-			lastCommand.equalsIgnoreCase("S") ||
-			lastCommand.equalsIgnoreCase("E") ||
-			lastCommand.equalsIgnoreCase("W") ||
-			lastCommand.equalsIgnoreCase("P")
-		) {
-			try {
-				puzzle.undo();
-				System.out.println(lastCommand + " undone.");
-			} catch (IllegalStateException ex) {
-				System.out.println("No previous moves available!");
+		if (commands.size() >= 2){
+			String lastCommand = commands.get(commands.size()-2).toUpperCase();
+			if (
+				validity.size() >= 1 && validity.get(validity.size()-1) &&
+				(
+					lastCommand.equalsIgnoreCase("N") ||
+					lastCommand.equalsIgnoreCase("S") ||
+					lastCommand.equalsIgnoreCase("E") ||
+					lastCommand.equalsIgnoreCase("W") ||
+					lastCommand.equalsIgnoreCase("P")
+				)
+			) {
+				try {
+					puzzle.undo();
+					System.out.println("Command '" + commandMap.get(lastCommand) + "' undone.");
+				} catch (IllegalStateException ex) {
+					System.out.println("No previous moves available!");
+				}
+			} else {
+				System.out.println("Command '" + commandMap.get(lastCommand) + "' cannot be undone.");
 			}
 		} else {
-			System.out.println(lastCommand + " cannot be undone.");
+			System.out.println("Not enough commands to undo move.");
 		}
 	}
 
@@ -320,10 +352,11 @@ public class TextUI {
 	 */
 	private void quitPuzzle() {
 		System.out.println(String.join(
-			"Would you like to save the game before quitting?\n",
-			"Options:\n",
-			"	Yes      [Y]\n",
-			"	No       [N]\n"
+			"\n",
+			"Would you like to save the game before quitting?",
+			"Options:",
+			"	Yes      [Y]",
+			"	No       [N]"
 		));
 		String response = getCommand();
 		if (response.equalsIgnoreCase("Y")){
@@ -344,12 +377,6 @@ public class TextUI {
 		return puzzle.toString();
 	}
 
-	public static void main(String[] args) {
-		TextUI ui = new TextUI();
-		ui.newGame();
-		ui.menu();
-	}
-
 	/**
 	 * A trace method for debugging (active when traceOn is true)
 	 *
@@ -360,14 +387,17 @@ public class TextUI {
 			System.out.println("trace: " + s);
 	}
 
-	private Scanner scnr     = null;
-	private Sokoban puzzle   = null;
-	private Player  player   = null;
+	private Scanner scnr      = null;
+	private Sokoban puzzle    = null;
+	private Player  player    = null;
 	private String  screenPath   = null;
-	private ArrayList<String>  commands  = null;
+	private ArrayList<String>   commands  = null;
+	private ArrayList<Boolean>  validity  = null;
+
 
 	private static String  workDir      = System.getProperty("user.dir");
 	private static Integer minScreen    = 1;
 	private static Integer maxScreen    = 90;
 	private static boolean traceOn      = false; // for debugging
+	private static Map<String,String> commandMap  =  null;
 }
