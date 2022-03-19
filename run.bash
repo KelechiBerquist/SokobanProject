@@ -17,11 +17,11 @@ rm  ./test/*.class
 
 # echo $CLASSPATH
 
-javac --class-path $CLASSPATH ./sokoban/*.java -Xdiags:verbose
-javac --class-path $CLASSPATH ./test/*.java -Xdiags:verbose
+# javac --class-path $CLASSPATH ./sokoban/*.java -Xdiags:verbose
+# javac --class-path $CLASSPATH ./test/*.java -Xdiags:verbose
 
-# java sokoban.TextUI
-# java sokoban.GUI
-java sokoban.PlaySokoban
+# # java sokoban.TextUI
+# # java sokoban.GUI
+# java sokoban.PlaySokoban
 
-# java org.junit.runner.JUnitCore test.TestTextUI #junit4
+# # java org.junit.runner.JUnitCore test.TestTextUI #junit4

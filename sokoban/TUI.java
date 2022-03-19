@@ -36,19 +36,6 @@ public class TUI {
 	 * Define commands for initialising class
 	 */
 	public void commonInitSteps() {
-		commandMap = Map.ofEntries(
-			entry("N", "North"),
-			entry("W", "West"),
-			entry("E", "East"),
-			entry("S", "South"),
-			entry("P", "Player Move"),
-			entry("U", "Undo"),
-			entry("A", "New Game"),
-			entry("R", "Restart"),
-			entry("V", "Save"),
-			entry("L", "Load Saved Game"),
-			entry("Q", "Quit Game")
-		);
 		scnr = new Scanner(System.in);
 		genGame();
 	}
@@ -80,18 +67,20 @@ public class TUI {
 		System.out.println(String.join(
 			"\n",
 			"Enter command using the keyboard.",
+			"   WALL='#'      BOX='$'          ACTOR='@'           TARGET='.'",
+	        "   EMPTY=' '     TARGET_BOX='*'   TARGET_ACTOR='+'",
 			"Possible commands:",
-			"     Move North            [N]",
-			"     Move South            [S]",
-			"     Move East             [E]",
-			"     Move West             [W]",
-			"     Player Move           [P]",
-			"     Undo Move             [U]",
-			"     New Game              [A]",
-			"     Restart Game          [R]",
-			"     Save Game             [V]",
-			"     Load Saved Game       [L]",
-			"     Quit Game             [Q]"
+			"   Move North            [N]",
+			"   Move South            [S]",
+			"   Move East             [E]",
+			"   Move West             [W]",
+			"   Player Move           [P]",
+			"   Undo Move             [U]",
+			"   New Game              [A]",
+			"   Restart Game          [R]",
+			"   Save Game             [V]",
+			"   Load Saved Game       [L]",
+			"   Quit Game             [Q]"
 		));
 	}
 
@@ -112,7 +101,6 @@ public class TUI {
 	 */
 	public String execute(String command) {
 		String returnVal = "";
-		commands.add(command);
 		if (command.equalsIgnoreCase("Q")) {
 			quitPuzzle();
 		} else if (command.equalsIgnoreCase("N")) {
@@ -141,7 +129,6 @@ public class TUI {
 			 */
 			Vector<Direction> choices = puzzle.canMove();
 			Direction         choice  = player.move(choices);
-			validity.add(true);
 			move(choice);
 		} else if (command.equalsIgnoreCase("U")) {
 			undoMove();
@@ -168,12 +155,11 @@ public class TUI {
 		String dirString =   dir.toString();
 		if (!puzzle.canMove(dir)) {
 			System.out.println(dirString + " is an invalid move.");
-			validity.add(false);
 			return;
 		} else {
 			System.out.println("Moving " + dirString);
 			puzzle.move(dir);
-			validity.add(true);
+			moves.add(dirString);
 		}
 		if (puzzle.onTarget()){
 			System.out.println("Game Won!");
@@ -202,8 +188,7 @@ public class TUI {
 	private void genGame() {
 		puzzle = new Sokoban(new File(screenPath));
 		player = new RandomPlayer();
-		commands = new ArrayList<String>();
-		validity = new ArrayList<Boolean>();
+		moves = new ArrayList<String>();
 	}
 
 
@@ -219,32 +204,23 @@ public class TUI {
 	/**
 	 * Undo last player move if move is E, W, N, S, P
 	 */
-	public void undoMove() {
-		if (commands.size() >= 2){
-			String lastCommand = commands.get(commands.size()-2).toUpperCase();
-			if (
-				validity.size() >= 1 && validity.get(validity.size()-1) &&
-				(
-					lastCommand.equalsIgnoreCase("N") ||
-					lastCommand.equalsIgnoreCase("S") ||
-					lastCommand.equalsIgnoreCase("E") ||
-					lastCommand.equalsIgnoreCase("W") ||
-					lastCommand.equalsIgnoreCase("P")
-				)
-			) {
-				try {
-					puzzle.undo();
-					System.out.println("Command '" + commandMap.get(lastCommand) + "' undone.");
-				} catch (IllegalStateException ex) {
-					System.out.println("No previous moves available!");
-				}
-			} else {
-				System.out.println("Command '" + commandMap.get(lastCommand) + "' cannot be undone.");
-			}
-		} else {
-			System.out.println("Not enough commands to undo move.");
-		}
-	}
+    private void undoMove() {
+        String msg = null;
+        String beforeUndo = puzzle.toString();
+        try {
+            puzzle.undo();
+        } catch (Exception ex) {
+
+        } finally {
+            String afterUndo = puzzle.toString();
+
+            if (beforeUndo.equalsIgnoreCase(afterUndo)){
+                System.out.println("Cannot undo move.");
+            } else {
+                System.out.println("Command '" + moves.get((moves.size()-1)) + "' undone.");
+            }
+        }
+    }
 
 	/**
 	 * Reset the puzzle state to the initial puzzle screen
@@ -387,17 +363,14 @@ public class TUI {
 			System.out.println("trace: " + s);
 	}
 
-	private Scanner scnr      = null;
-	private Sokoban puzzle    = null;
-	private Player  player    = null;
+	private Scanner scnr         = null;
+	private Sokoban puzzle       = null;
+	private Player  player       = null;
 	private String  screenPath   = null;
-	private ArrayList<String>   commands  = null;
-	private ArrayList<Boolean>  validity  = null;
-
+	private ArrayList<String>   moves  = null;
 
 	private static String  workDir      = System.getProperty("user.dir");
 	private static Integer minScreen    = 1;
 	private static Integer maxScreen    = 90;
 	private static boolean traceOn      = false; // for debugging
-	private static Map<String,String> commandMap  =  null;
 }
