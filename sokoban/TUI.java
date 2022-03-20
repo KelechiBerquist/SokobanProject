@@ -5,7 +5,6 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
-import static java.util.Map.entry;
 
 /**
  * A text-based user interface for a Sokoban puzzle.
@@ -47,7 +46,8 @@ public class TUI {
 	 */
 	public void menu() {
 		String command = "";
-		System.out.println("Loading game from the file: " + screenPath);
+		String relPath = screenPath.substring(workDir.length());
+		System.out.println("Loading game from the file: " + relPath);
 		System.out.print(puzzle);
 		while (!command.equalsIgnoreCase("Q") && !puzzle.onTarget())  {
 			displayMenu();
@@ -68,7 +68,7 @@ public class TUI {
 			"\n",
 			"Enter command using the keyboard.",
 			"   WALL='#'      BOX='$'          ACTOR='@'           TARGET='.'",
-	        "   EMPTY=' '     TARGET_BOX='*'   TARGET_ACTOR='+'",
+			"   EMPTY=' '     TARGET_BOX='*'   TARGET_ACTOR='+'",
 			"Possible commands:",
 			"   Move North            [N]",
 			"   Move South            [S]",
@@ -102,44 +102,44 @@ public class TUI {
 	public String execute(String command) {
 		String returnVal = "";
 		if (command.equalsIgnoreCase("Q")) {
-			quitPuzzle();
+			this.quitPuzzle();
 		} else if (command.equalsIgnoreCase("N")) {
 			/**
 			 * Move the actor north
 			*/
-			move(Direction.NORTH);
+			this.move(Direction.NORTH);
 		} else if (command.equalsIgnoreCase("S")) {
 			/**
 			 * Move the actor south
 			 */
-			move(Direction.SOUTH);
+			this.move(Direction.SOUTH);
 		} else if (command.equalsIgnoreCase("E")) {
 			/**
 			 * Move the actor east
 			 */
-			move(Direction.EAST);
+			this.move(Direction.EAST);
 		} else if (command.equalsIgnoreCase("W")) {
 			/**
 			 * Move the actor west
 			 */
-			move(Direction.WEST);
+			this.move(Direction.WEST);
 		} else if (command.equalsIgnoreCase("P")) {
 			/**
 			 * Move the actor according to the computer player's choice
 			 */
 			Vector<Direction> choices = puzzle.canMove();
 			Direction         choice  = player.move(choices);
-			move(choice);
+			this.move(choice);
 		} else if (command.equalsIgnoreCase("U")) {
-			undoMove();
+			this.undoMove();
 		} else if (command.equalsIgnoreCase("R")) {
 			clearPuzzle();
 		} else if (command.equalsIgnoreCase("A")) {
-			newGame();
+			this.newGame();
 		} else if (command.equalsIgnoreCase("V")) {
-			returnVal = savePuzzle();
+			returnVal = this.savePuzzle();
 		} else if (command.equalsIgnoreCase("L")) {
-			loadSavedPuzzle();
+			this.loadSavedPuzzle();
 		} else {
 			System.out.println("Unknown command (" + command + ")");
 		}
@@ -191,7 +191,6 @@ public class TUI {
 		moves = new ArrayList<String>();
 	}
 
-
 	/**
 	 * Set up new game
 	 */
@@ -204,8 +203,7 @@ public class TUI {
 	/**
 	 * Undo last player move if move is E, W, N, S, P
 	 */
-    private void undoMove() {
-        String msg = null;
+	private void undoMove() {
         String beforeUndo = puzzle.toString();
         try {
             puzzle.undo();
@@ -315,13 +313,12 @@ public class TUI {
 	 * Load saved puzzle from file
 	 */
 	public void loadSavedPuzzle() {
-		System.out.println("\n\nLocating saved game files.");
 		String filename = chooseSavedPuzzle();
 		String filepath = workDir + "/snapshot/" + filename;
 		setScreenFile(filepath);
+		System.out.println("\n\nNew game loaded.");
 		genGame();
 	}
-
 
 	/**
 	 * Give player the option of saving the game before quitting
@@ -336,7 +333,7 @@ public class TUI {
 		));
 		String response = getCommand();
 		if (response.equalsIgnoreCase("Y")){
-			savePuzzle();
+			this.savePuzzle();
 		} else if (response.equalsIgnoreCase("N")) {
 			System.out.println("Game will not be saved before quitting.");
 		} else {
@@ -352,6 +349,16 @@ public class TUI {
 	public String getPuzzleState() {
 		return puzzle.toString();
 	}
+
+	/**
+     * Function for executing this game application
+     *  via gui without initialising instance
+     * @param args provided arguments
+     */
+	public static void main(String[] args) {
+        TUI tui = new TUI();
+        tui.menu();
+    }
 
 	/**
 	 * A trace method for debugging (active when traceOn is true)

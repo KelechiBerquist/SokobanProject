@@ -1,15 +1,22 @@
 package sokoban;
 
- 
 import java.io.*;
 import java.util.*;
 
-
-public class Helpers {
-	Helpers(){}
-
-	/** 
+/**
+ * File and string io handling class
+ * @author Dr Kelechi Berquist
+ * @author Dr Mark C. Sinclair
+ * @version March 2022
+ */
+public final class Helpers {
+	/**
 	 * Get a list of Strings from a multiline String.
+	 */
+	/**
+	 * Reads string into an array list
+	 * @param str String to be read
+	 * @return ArrayList output of string with newline as line break
 	 */
 	public static ArrayList<String> listFromString(String str){
 		Scanner           scnr = null;
@@ -24,8 +31,10 @@ public class Helpers {
 		return lines;
 	}
 
-	/** 
-	 * Convert file to string
+	/**
+	 * Converts file content to string
+	 * @param file File with content about to be read
+	 * @return String content of file
 	 */
 	public static String fileAsString(File file){
 		if (file == null)
@@ -44,5 +53,4 @@ public class Helpers {
 		}
 		return sb.toString();
 	}
-
 }
