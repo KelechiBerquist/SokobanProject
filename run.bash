@@ -11,32 +11,9 @@ export CLASSPATH=$WORKDIR/ext/byte-buddy-agent-1.12.8.jar:$WORKDIR/ext/objenesis
 export PATH="$(which java)":$PATH
 export CWD=$WORKDIR
 
-
-# echo $WORKDIR
-# echo $(which java)
-# echo $(which javac)
-# echo $CWD
-
 cd $WORKDIR
 
-rm  ./sokoban/*.class
-rm  ./sokoban/*.ctxt
+javac --class-path $CLASSPATH $WORKDIR/sokoban/*.java -Xdiags:verbose
+# # # java org.junit.runner.JUnitCore sokoban.TUITest #junit4
 
-
-echo
-echo
-echo
-echo $CLASSPATH
-echo
-echo
-echo
-echo $PATH
-echo
-echo
-echo
-
-# javac --class-path $CLASSPATH $WORKDIR/sokoban/*.java -Xdiags:verbose
-# # # # java sokoban.TextUI
-# # # # java sokoban.GUI
-# java --class-path $CLASSPATH sokoban.PlaySokoban
-# # # # java org.junit.runner.JUnitCore sokoban.TUITest #junit4
+java --class-path $CLASSPATH sokoban.PlaySokoban

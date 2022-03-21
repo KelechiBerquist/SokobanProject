@@ -69,10 +69,8 @@ public class BoardPanel extends JPanel {
             }
 
             for (Integer j = 0; j < numGrid; j++){
-                JButton button = null;
-                button = new JButton();
+                ButtonFactory button = new ButtonFactory(new String[]{null, null});
                 button.setPreferredSize(new Dimension(20, 20));
-
                 if (countBox != 0 && j >= 0 && j < countBox) {
                     String theChar =  Character.toString(row.charAt(j));
                     if (!(theChar.equalsIgnoreCase(" "))){
@@ -80,10 +78,6 @@ public class BoardPanel extends JPanel {
                         button.setMargin(new Insets(0, 0, 0, 0));
                     }
                 }
-                button.setOpaque(false);
-                button.setContentAreaFilled(false);
-                button.setBorderPainted(false);
-                button.setBorder(null);
                 this.add(button);
             }
 

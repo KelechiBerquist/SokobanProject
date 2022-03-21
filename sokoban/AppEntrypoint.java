@@ -44,6 +44,7 @@ public class AppEntrypoint  {
 			gUI.newGame();
 		} else {
 			System.out.println("Unknown command (" + command + ")");
+			genPlayOptions();
 		}
 	}
 

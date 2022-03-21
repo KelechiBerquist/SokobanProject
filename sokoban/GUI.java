@@ -69,7 +69,7 @@ public class GUI implements ActionListener  {
     /**
      * Initialise game attributes
      */
-    private void setScreen() {
+    public void setScreen() {
         Integer randomNum   =   ThreadLocalRandom.current().nextInt(minScreen, maxScreen + 1);
         screenFile          =   "screen." + randomNum.toString();
         screenPath          =   workDir + "/screens/" + screenFile;
@@ -79,7 +79,7 @@ public class GUI implements ActionListener  {
     /**
      * Generate a new game from current game attribute
      */
-    private void setPuzzle() {
+    public void setPuzzle() {
         puzzle   =  new Sokoban(loadFile);
         player   =  new RandomPlayer();
         moves    =  new ArrayList<String>();
@@ -88,8 +88,22 @@ public class GUI implements ActionListener  {
     /**
      * Refresh frame and clear output message
      */
+    public void setState() {
+        gameState = Helpers.listFromString(puzzle.toString());
+    }
+
+    /**
+     * Refresh frame and clear output message
+     */
+    public ArrayList<String> getState() {
+       return gameState;
+    }
+
+    /**
+     * Refresh frame and clear output message
+     */
     private void refreshFrame() {
-        ArrayList<String> gameState = Helpers.listFromString(puzzle.toString());
+        this.setState();
         this.frame.refreshFrame(gameState, this.msg);
         this.msg = "";
     }
@@ -306,6 +320,7 @@ public class GUI implements ActionListener  {
     private String   screenPath =  null;
 
     private ArrayList<String>  moves     = null;
+    private ArrayList<String> gameState  = null;
 
     private static Font    font          =  new Font("Monospaced", Font.BOLD, 20);
     private static Integer minScreen     = 1;
